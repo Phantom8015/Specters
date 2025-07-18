@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specters</title>
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <meta
+      name="description"
+      content="A powerful web-based file explorer with terminal integration, drag-and-drop support, and real-time system monitoring."
+    />
+    <link rel="stylesheet" href="styles.css?v=2025" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-brand">
+          <img src="favicon.png" alt="Specterss Logo" class="nav-logo" />
+          <span>Specters</span>
+        </div>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#installation">Installation</a>
+          <a
+            href="javascript:void(0)"
+            class="github-link"
+            onclick="openGitHub()"
+          >
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>
+              Bring your server to <span class="gradient-text">life</span>.
+            </h1>
+            <p>
+              A powerful web-based Linux interface. Fast, modern, and reliable
+              file management in your browser.
+            </p>
+
+            <a href="#installation" class="btn btn-primary">
+              <i class="fas fa-download"></i>
+              Get Started
+            </a>
+
+            <div class="version-info">
+              <span>•</span>
+              <span>Free & Open Source</span>
+              <span>•</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div
+            class="browser-mockup"
+            data-tilt
+            data-tilt-max="10"
+            data-tilt-speed="400"
+            data-tilt-perspective="1000"
+          >
+            <div class="browser-header">
+              <div class="browser-controls">
+                <span class="control red"></span>
+                <span class="control yellow"></span>
+                <span class="control green"></span>
+              </div>
+              <div class="browser-url">10.0.0.232:3000</div>
+            </div>
+            <div class="browser-content">
+              <iframe
+                src="demo.html"
+                width="100%"
+                height="100%"
+                frameborder="0"
+                style="border: none; background: #181a20"
+              >
+              </iframe>
+              <div class="iframe-overlay"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="features">
+        <div class="container">
+          <h2>Features</h2>
+          <div class="features-carousel">
+            <div class="carousel-container">
+              <div class="carousel-track" id="feature-track">
+                <div class="feature-card active">
+                  <div class="feature-icon">
+                    <i class="fas fa-terminal"></i>
+                  </div>
+                  <h3>Integrated Terminal</h3>
+                  <p>
+                    Built-in terminal with WebSocket support. Execute commands
+                    directly in your file explorer with real-time output.
+                  </p>
+                </div>
+
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                  </div>
+                  <h3>Drag & Drop Upload</h3>
+                  <p>
+                    Effortlessly upload files by dragging them into the browser.
+                    Supports multiple files and large uploads up to 10GB.
+                  </p>
+                </div>
+
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <h3>System Monitoring</h3>
+                  <p>
+                    Real-time CPU, memory, and GPU usage monitoring. Keep track
+                    of your system performance while managing files.
+                  </p>
+                </div>
+
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="fas fa-eye"></i>
+                  </div>
+                  <h3>File Preview</h3>
+                  <p>
+                    Preview text files, images, videos, and documents without
+                    downloading. Supports syntax highlighting for code files.
+                  </p>
+                </div>
+
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                  </div>
+                  <h3>Secure Access</h3>
+                  <p>
+                    Advanced security features with user authentication and
+                    permission management. Keep your files safe and secure.
+                  </p>
+                </div>
+
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                  </div>
+                  <h3>Responsive Design</h3>
+                  <p>
+                    Fully responsive interface that works seamlessly on desktop,
+                    tablet, and mobile devices. Access your files anywhere.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="carousel-navigation">
+              <button class="carousel-btn prev" id="prev-btn">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <div class="carousel-dots" id="carousel-dots">
+                <span class="dot active" data-slide="0"></span>
+                <span class="dot" data-slide="1"></span>
+                <span class="dot" data-slide="2"></span>
+                <span class="dot" data-slide="3"></span>
+                <span class="dot" data-slide="4"></span>
+                <span class="dot" data-slide="5"></span>
+              </div>
+              <button class="carousel-btn next" id="next-btn">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="requirements" class="requirements-section">
+        <div class="container">
+          <h2>Requirements</h2>
+          <div class="requirements-grid">
+            <div class="requirement-item">
+              <i class="fab fa-node-js"></i>
+              <h3>Node.js (v14.0 or higher)</h3>
+            </div>
+            <div class="requirement-item">
+              <i class="fas fa-terminal"></i>
+              <h3>A Linux Server</h3>
+            </div>
+            <div class="requirement-item">
+              <i class="fas fa-globe"></i>
+              <h3>Web Browser</h3>
+            </div>
+            <div class="requirement-item">
+              <i class="fas fa-network-wired"></i>
+              <h3>Good Internet</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="installation" class="installation">
+        <div class="container">
+          <h2>Installation</h2>
+          <div class="install-steps">
+            <div class="install-step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3>Run the installer on your server</h3>
+                <div class="code-block">
+                  <code
+                    >curl -fsSL
+                    https://raw.githubusercontent.com/Phantom8015/Specters/main/install.sh
+                    | bash</code
+                  >
+                  <button class="copy-btn" onclick="copyToClipboard(this)">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+                <p>
+                  The script will automatically install Node.js, clone the
+                  repository, and set up all dependencies on your server.
+                </p>
+              </div>
+            </div>
+
+            <div class="install-step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>Start the server</h3>
+                <div class="code-block">
+                  <code>cd Specters && npm start</code>
+                  <button class="copy-btn" onclick="copyToClipboard(this)">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+                <p>
+                  Navigate to the project directory and start the web server on
+                  your server machine.
+                </p>
+              </div>
+            </div>
+
+            <div class="install-step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3>Access from your PC</h3>
+                <div class="code-block">
+                  <code>http://YOUR_SERVER_IP:3000</code>
+                  <button class="copy-btn" onclick="copyToClipboard(this)">
+                    <i class="fas fa-external-link-alt"></i>
+                  </button>
+                </div>
+                <p>
+                  Replace YOUR_SERVER_IP with your server's IP address. Ensure
+                  port 3000 is accessible through your firewall or use port
+                  forwarding if needed.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="manual-install">
+            <h3>Manual Installation</h3>
+            <div class="code-block">
+              <code>git clone https://github.com/Phantom8015/Specters.git</code>
+              <button class="copy-btn" onclick="copyToClipboard(this)">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+            <div class="code-block">
+              <code>cd Specters</code>
+              <button class="copy-btn" onclick="copyToClipboard(this)">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+            <div class="code-block">
+              <code>npm install</code>
+              <button class="copy-btn" onclick="copyToClipboard(this)">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+            <div class="code-block">
+              <code>npm start</code>
+              <button class="copy-btn" onclick="copyToClipboard(this)">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+            <p style="color: var(--text-gray); margin-top: 1rem">
+              <strong>Note:</strong> This application must run on a server. If
+              you're running it on a remote server, ensure port 3000 is open in
+              your firewall settings, or set up port forwarding to access it
+              from your local PC.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

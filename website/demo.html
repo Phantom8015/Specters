@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specters - Web File Explorer</title>
+    <link rel="stylesheet" href="demo-style.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <div class="nav-buttons">
+          <button id="back-btn" class="nav-btn" title="Back">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <button id="forward-btn" class="nav-btn" title="Forward">
+            <i class="fas fa-arrow-right"></i>
+          </button>
+          <button id="up-btn" class="nav-btn" title="Up">
+            <i class="fas fa-arrow-up"></i>
+          </button>
+          <button id="refresh-btn" class="nav-btn" title="Refresh">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <button
+            id="layout-btn"
+            class="nav-btn"
+            title="Layout: Integrated Terminal"
+          >
+            <i class="fas fa-window-restore"></i>
+          </button>
+        </div>
+
+        <div class="path-bar">
+          <input
+            type="text"
+            id="path-input"
+            placeholder="Enter path..."
+            value="/home/user"
+          />
+          <button id="cd-btn" title="Open terminal and CD to this path">
+            CD
+          </button>
+        </div>
+
+        <div class="toolbar">
+          <button id="new-folder-btn" class="toolbar-btn" title="New Folder">
+            <i class="fas fa-folder-plus"></i>
+          </button>
+          <button id="upload-btn" class="toolbar-btn" title="Upload Files">
+            <i class="fas fa-upload"></i>
+          </button>
+          <button
+            id="preview-btn"
+            class="toolbar-btn"
+            title="Preview Selected File"
+            disabled
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+          <button
+            id="download-btn"
+            class="toolbar-btn"
+            title="Download"
+            disabled
+          >
+            <i class="fas fa-download"></i>
+          </button>
+          <button id="copy-btn" class="toolbar-btn" title="Copy" disabled>
+            <i class="fas fa-copy"></i>
+          </button>
+          <button id="cut-btn" class="toolbar-btn" title="Cut" disabled>
+            <i class="fas fa-cut"></i>
+          </button>
+          <button id="paste-btn" class="toolbar-btn" title="Paste" disabled>
+            <i class="fas fa-paste"></i>
+          </button>
+          <button id="delete-btn" class="toolbar-btn" title="Delete" disabled>
+            <i class="fas fa-trash"></i>
+          </button>
+          <button
+            id="shutdown-btn"
+            class="toolbar-btn btn-shutdown"
+            title="Turn Off Server"
+          >
+            <i class="fas fa-power-off"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div class="file-explorer">
+          <div class="file-list-container">
+            <div class="file-list-header">
+              <div class="file-list-title">Files</div>
+              <div class="sort-controls">
+                <label>Sort by:</label>
+                <div class="custom-sort-dropdown" id="custom-sort-dropdown">
+                  <button class="custom-sort-button" id="custom-sort-button">
+                    <span id="sort-button-text">Name</span>
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div class="custom-sort-menu" id="custom-sort-menu">
+                    <div class="custom-sort-item selected" data-value="name">
+                      Name
+                    </div>
+                    <div class="custom-sort-item" data-value="size">Size</div>
+                    <div class="custom-sort-item" data-value="date">
+                      Date Modified
+                    </div>
+                    <div class="custom-sort-item" data-value="type">
+                      File Type
+                    </div>
+                  </div>
+                </div>
+                <button
+                  id="sort-order-btn"
+                  class="sort-order-btn"
+                  title="Toggle sort order"
+                >
+                  <i class="fas fa-sort-alpha-down"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="file-column-headers">
+              <div class="column-header-spacer"></div>
+              <div class="column-header">Size</div>
+              <div class="column-header">Date Modified</div>
+              <div class="column-header">Permissions</div>
+            </div>
+
+            <div id="file-list" class="file-list">
+              <div class="file-item" data-name="Desktop" data-type="folder">
+                <div class="file-name">
+                  <i class="fas fa-folder folder"></i>
+                  <span>Desktop</span>
+                </div>
+                <div class="file-size">-</div>
+                <div class="file-date">2025-07-18, 9:30:15 AM</div>
+                <div class="file-permissions">rwx------</div>
+              </div>
+              <div class="file-item" data-name="Documents" data-type="folder">
+                <div class="file-name">
+                  <i class="fas fa-folder folder"></i>
+                  <span>Documents</span>
+                </div>
+                <div class="file-size">-</div>
+                <div class="file-date">2025-07-17, 2:45:30 PM</div>
+                <div class="file-permissions">rwx------</div>
+              </div>
+              <div class="file-item" data-name="Downloads" data-type="folder">
+                <div class="file-name">
+                  <i class="fas fa-folder folder"></i>
+                  <span>Downloads</span>
+                </div>
+                <div class="file-size">-</div>
+                <div class="file-date">2025-07-18, 11:20:45 AM</div>
+                <div class="file-permissions">rwx------</div>
+              </div>
+              <div class="file-item" data-name="Pictures" data-type="folder">
+                <div class="file-name">
+                  <i class="fas fa-folder folder"></i>
+                  <span>Pictures</span>
+                </div>
+                <div class="file-size">-</div>
+                <div class="file-date">2025-07-16, 6:15:20 PM</div>
+                <div class="file-permissions">rwx------</div>
+              </div>
+              <div class="file-item" data-name="Projects" data-type="folder">
+                <div class="file-name">
+                  <i class="fas fa-folder folder"></i>
+                  <span>Projects</span>
+                </div>
+                <div class="file-size">-</div>
+                <div class="file-date">2025-07-15, 10:30:00 AM</div>
+                <div class="file-permissions">rwx------</div>
+              </div>
+              <div
+                class="file-item selected"
+                data-name="resume.pdf"
+                data-type="file"
+              >
+                <div class="file-name">
+                  <i class="fas fa-file file"></i>
+                  <span>resume.pdf</span>
+                </div>
+                <div class="file-size">245 KB</div>
+                <div class="file-date">2025-07-10, 3:22:15 PM</div>
+                <div class="file-permissions">rw-------</div>
+              </div>
+              <div class="file-item" data-name="notes.txt" data-type="file">
+                <div class="file-name">
+                  <i class="fas fa-file file"></i>
+                  <span>notes.txt</span>
+                </div>
+                <div class="file-size">12.3 KB</div>
+                <div class="file-date">2025-07-18, 8:45:30 AM</div>
+                <div class="file-permissions">rw-------</div>
+              </div>
+              <div class="file-item" data-name=".bashrc" data-type="file">
+                <div class="file-name">
+                  <i class="fas fa-file file"></i>
+                  <span>.bashrc</span>
+                </div>
+                <div class="file-size">3.2 KB</div>
+                <div class="file-date">2025-07-05, 1:15:45 PM</div>
+                <div class="file-permissions">rw-------</div>
+              </div>
+            </div>
+
+            <div id="drop-zone" class="drop-zone">
+              <div class="drop-message">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drop files here to upload</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="terminal-container-wrapper" class="terminal-container-wrapper">
+          <div class="terminal-resize-handle" id="terminal-resize-handle"></div>
+          <div class="terminal-header" id="terminal-header">
+            <div class="terminal-title">
+              <i class="fas fa-terminal"></i>
+              Terminal
+            </div>
+            <div class="system-stats" id="system-stats">
+              <div class="stat-item" id="cpu-stat">
+                <i class="fas fa-microchip"></i>
+                <span id="cpu-load">24</span>%
+              </div>
+              <div class="stat-item" id="memory-stat">
+                <i class="fas fa-memory"></i>
+                <span id="memory-usage">68</span>%
+              </div>
+              <div class="stat-item" id="gpu-stat" style="display: flex">
+                <i class="fas fa-tv"></i>
+                <span id="gpu-usage">12</span>%
+              </div>
+            </div>
+            <div class="terminal-controls">
+              <div class="font-size-control">
+                <button
+                  id="font-decrease"
+                  class="terminal-control-btn font-btn"
+                  title="Decrease Font Size"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span id="font-size-display">11px</span>
+                <button
+                  id="font-increase"
+                  class="terminal-control-btn font-btn"
+                  title="Increase Font Size"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div id="terminal-container" class="xterm-glassy">
+            <div
+              id="demo-terminal"
+              class="demo-terminal-initial"
+              style="
+                color: #d4d4d4;
+                font-family: &quot;SF Pro&quot;, monospace;
+                font-size: 11px;
+                padding: 10px;
+                line-height: 1.4;
+                background: #12141b;
+                height: 100%;
+                overflow-y: auto;
+              "
+            >
+              <div id="terminal-line">
+                <span style="color: #4caf50">user@specters</span>:<span
+                  style="color: #64a0ff"
+                  >~</span
+                >$ <span id="typed-command"></span
+                ><span id="cursor" style="animation: blink 1s infinite">█</span>
+              </div>
+              <div
+                id="command-output"
+                style="display: none; white-space: pre-wrap; margin-top: 10px"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="context-menu" class="context-menu hidden">
+        <div class="context-item separator"></div>
+        <div class="context-item" data-action="preview">
+          <i class="fas fa-eye"></i> Preview
+        </div>
+        <div class="context-item separator"></div>
+        <div class="context-item" data-action="copy">
+          <i class="fas fa-copy"></i> Copy
+        </div>
+        <div class="context-item" data-action="cut">
+          <i class="fas fa-cut"></i> Cut
+        </div>
+        <div class="context-item" data-action="paste">
+          <i class="fas fa-paste"></i> Paste
+        </div>
+        <div class="context-item separator"></div>
+        <div class="context-item" data-action="rename">
+          <i class="fas fa-pencil-alt"></i> Rename
+        </div>
+        <div class="context-item" data-action="delete">
+          <i class="fas fa-trash"></i> Delete
+        </div>
+        <div class="context-item separator"></div>
+        <div class="context-item" data-action="properties">
+          <i class="fas fa-info-circle"></i> Properties
+        </div>
+      </div>
+
+      <div id="terminal-settings-modal" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Terminal Settings</h3>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="settings-group">
+              <label class="settings-label">Font Size</label>
+              <div class="settings-option">
+                <input
+                  type="range"
+                  id="terminal-font-size-slider"
+                  min="8"
+                  max="24"
+                  value="11"
+                  class="settings-slider"
+                />
+                <span id="terminal-font-size-value" class="settings-value"
+                  >11px</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary modal-close">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="editor-modal" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="editor-title">Edit File</h3>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <textarea id="file-editor" placeholder="File content..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button id="save-file-btn" class="btn btn-primary">Save</button>
+            <button class="btn btn-secondary modal-close">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="properties-modal" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Properties</h3>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div id="properties-content"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary modal-close">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="preview-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+          <div class="modal-header">
+            <h3 id="preview-title">File Preview</h3>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div id="preview-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+      </div>
+
+      <div id="notifications" class="notifications"></div>
+
+      <div id="upload-progress" class="upload-progress hidden">
+        <div class="upload-progress-header">
+          <div class="upload-progress-title">Uploading Files</div>
+          <button id="upload-cancel-btn" class="upload-cancel-btn">
+            Cancel
+          </button>
+        </div>
+        <div id="upload-files-list" class="upload-files-list"></div>
+        <div class="upload-overall-progress">
+          <div id="upload-overall-text" class="upload-overall-text">
+            Preparing upload...
+          </div>
+          <div class="upload-progress-bar">
+            <div class="upload-progress-fill" id="upload-overall-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" id="file-input" multiple style="display: none" />
+
+    <input
+      type="file"
+      id="settings-import-input"
+      accept=".json"
+      style="display: none"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.min.js"></script>
+
+    <style>
+      @keyframes blink {
+        0%,
+        50% {
+          opacity: 1;
+        }
+        51%,
+        100% {
+          opacity: 0;
+        }
+      }
+    </style>
+
+    <script>
+      function typeCommand() {
+        const command = "cat todo.txt";
+        const typedElement = document.getElementById("typed-command");
+        const cursor = document.getElementById("cursor");
+        const output = document.getElementById("command-output");
+
+        let i = 0;
+        const typeInterval = setInterval(() => {
+          if (i < command.length) {
+            typedElement.textContent = command.substring(0, i + 1);
+            i++;
+          } else {
+            clearInterval(typeInterval);
+
+            setTimeout(() => {
+              cursor.style.display = "none";
+              output.style.display = "block";
+              output.textContent = `todo:
+
+1. download specters
+2. download specters
+3. download specters
+              `;
+            }, 1000);
+          }
+        }, 150);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(typeCommand, 1000);
+      });
+    </script>
+
+    <script src="demo-data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

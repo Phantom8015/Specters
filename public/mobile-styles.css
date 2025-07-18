@@ -1,0 +1,239 @@
+@media screen and (max-width: 768px) {
+  .header {
+    padding: 8px 12px;
+    margin: 8px 8px 4px 8px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .nav-buttons {
+    gap: 4px;
+  }
+
+  .nav-buttons .nav-btn:not(#back-btn):not(#refresh-btn) {
+    display: none;
+  }
+
+  .toolbar {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar .toolbar-btn:not(#delete-btn):not(#shutdown-btn) {
+    display: none;
+  }
+
+  .path-bar {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  #path-input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  #cd-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .file-column-headers {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    column-gap: 16px;
+    padding: 6px 16px 4px 16px;
+  }
+
+  .file-column-headers .column-header:nth-child(3),
+  .file-column-headers .column-header:nth-child(4) {
+    display: none;
+  }
+
+  .file-item {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    column-gap: 16px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .file-item .file-date,
+  .file-item .file-permissions {
+    display: none;
+  }
+
+  .file-size {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .file-name {
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .file-name i {
+    font-size: 16px;
+    min-width: 16px;
+  }
+
+  .file-name span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .terminal-header {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .system-stats {
+    gap: 8px;
+  }
+
+  .stat-item {
+    font-size: 11px;
+  }
+
+  .font-size-control {
+    gap: 4px;
+  }
+
+  .terminal-control-btn {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+  #font-size-display {
+    font-size: 11px;
+    min-width: 30px;
+  }
+
+  .modal-content {
+    width: 95vw;
+    max-width: 95vw;
+    margin: 10px;
+    border-radius: 8px;
+  }
+
+  .modal-large .modal-content {
+    width: 98vw;
+    max-width: 98vw;
+    height: 90vh;
+    margin: 5vh auto;
+  }
+
+  .context-menu {
+    min-width: 180px;
+    font-size: 14px;
+  }
+
+  .context-item {
+    padding: 12px 16px;
+  }
+
+  .upload-progress {
+    margin: 8px;
+    border-radius: 8px;
+  }
+
+  .upload-progress-header {
+    padding: 12px 16px;
+  }
+
+  .file-list-container {
+    margin: 0 8px 8px 8px;
+    border-radius: 8px;
+  }
+
+  .sort-controls {
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  .custom-sort-dropdown {
+    min-width: 80px;
+  }
+
+  .custom-sort-button {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .terminal-container-wrapper {
+    margin: 0 8px 8px 8px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .header {
+    padding: 6px 8px;
+    margin: 4px;
+    gap: 6px;
+  }
+
+  .toolbar .toolbar-btn:not(#shutdown-btn) {
+    display: none;
+  }
+
+  .nav-buttons .nav-btn:not(#back-btn) {
+    display: none;
+  }
+
+  .file-item {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .file-name {
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .file-column-headers {
+    padding: 4px 12px;
+  }
+
+  .file-list-container {
+    margin: 0 4px 4px 4px;
+  }
+
+  .terminal-container-wrapper {
+    margin: 0 4px 4px 4px;
+  }
+
+  .modal-content {
+    width: 98vw;
+    margin: 5px;
+  }
+
+  .path-bar label {
+    display: none;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .file-item {
+    padding: 14px 16px;
+    min-height: 50px;
+  }
+
+  .toolbar-btn,
+  .nav-btn {
+    padding: 10px 12px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .context-item {
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+
+  #cd-btn {
+    padding: 10px 16px;
+    min-height: 44px;
+  }
+}

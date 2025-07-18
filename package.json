@@ -1,0 +1,32 @@
+{
+  "name": "specters",
+  "version": "1.0.0",
+  "description": "Specters - A powerful web-based file explorer with terminal integration and system monitoring",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "archiver": "^5.3.1",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "mime-types": "^2.1.35",
+    "multer": "^1.4.5-lts.1",
+    "node-pty": "^1.0.0",
+    "systeminformation": "^5.27.7",
+    "ws": "^8.18.3",
+    "yauzl": "^2.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "file-explorer",
+    "web",
+    "drag-drop",
+    "terminal"
+  ],
+  "author": "",
+  "license": "MIT"
+}

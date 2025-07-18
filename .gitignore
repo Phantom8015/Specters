@@ -1,0 +1,5 @@
+node_modules
+.vscode
+a.sh
+.DS_Store
+.vercel
