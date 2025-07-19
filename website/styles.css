@@ -343,7 +343,7 @@ body {
 }
 
 .features {
-  padding: 8rem 0;
+  padding: 3rem 0;
 }
 
 .section-title {
@@ -739,6 +739,26 @@ body {
 }
 
 .install-step:hover {
+  background: var(--bg-hover);
+}
+
+
+.docker-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  margin-top: 3rem;
+  border-radius: 8px;
+  padding: 20px;
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
+  transition: var(--theme-transition);
+  margin-bottom: 3rem;
+}
+
+.docker-step:hover {
   background: var(--bg-hover);
 }
 

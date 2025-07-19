@@ -16,13 +16,47 @@ Note: This has not been tested outside of Ubuntu/Debian. Stability is not guaran
 - **Modern UI** - Clean, intuitive interface inspired by modern design principles
 
 ## Installing 
-1. **Run the installer script**
 
-### On your server:
+### Docker (Recommended)
+
+The easiest way to run Specters is using Docker:
+
+#### Using Docker Compose
+Run commands as root if you experience permission issues.
+
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/Phantom8015/Specters/main/docker-compose.yml
+nano docker-compose.yml
+docker-compose up -d
+```
+
+#### Using Docker Run
+
+**Basic usage:**
+```bash
+docker run -p 3000:3000 phantom8016/specters:latest
+```
+
+**Production setup with volume mounts:**
+```bash
+docker run -d \
+  --name specters \
+  -p 3000:3000 \
+  -v /home:/app/managed/home:rw \
+  -v /var/log:/app/managed/logs:ro \
+  --restart unless-stopped \
+  phantom8016/specters:latest
+```
+
+### Traditional Installation
+
+#### Quick Install Script
+**On your server:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Phantom8015/Specters/main/install.sh | bash
 ```
-### On your PC:
+
+**On your PC:**
 1. **Open your browser (on your pc)**
    Navigate to `http://<YOUR-SERVER-IP>:3000`
 
@@ -81,3 +115,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - **Issues**: [GitHub Issues](https://github.com/Phantom8015/Specters/issues)
 - **Contact**: [Phantom8015](https://github.com/Phantom8015)
+
