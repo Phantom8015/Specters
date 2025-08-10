@@ -11,6 +11,15 @@ let terminalFontSize = 11;
 let isResizing = false;
 
 function openTerminal() {
+  try {
+    if (
+      window.settingsManager &&
+      window.settingsManager.settings &&
+      window.settingsManager.settings.layoutMode === "explorer-only"
+    ) {
+      return;
+    }
+  } catch (_) {}
   if (!window.Terminal) {
     alert("Terminal library not loaded.");
     return;
@@ -100,7 +109,18 @@ function openTerminal() {
     termSocket = new WebSocket(`ws://${window.location.host}/terminal`);
     termSocket.onopen = () => {
       console.log("Terminal WebSocket connected");
-      terminal.write("\x1b[90mTerminal connected. Press enter..\x1b[0m\r\n");
+
+      try {
+        const settings = window.settingsManager?.settings || {};
+        const { startupPath, startupCommand } = settings;
+        if (startupPath) {
+          window.fileExplorer?.setCurrentPath?.(startupPath);
+          termSocket.send(`cd "${startupPath}"\r`);
+        }
+        if (startupCommand) {
+          termSocket.send(`${startupCommand}\r`);
+        }
+      } catch (_) {}
 
       terminal.focus();
     };
@@ -218,10 +238,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 class FileExplorer {
   constructor() {
-    this.currentPath = "/home/userland";
+    this.currentPath = "/home/";
     this.selectedFiles = new Set();
     this.clipboard = { items: [], operation: null };
-    this.history = ["/home/userland"];
+    this.history = ["/home/"];
     this.historyIndex = 0;
     this.cache = new Map();
     this.cacheTimeout = 10000;
@@ -283,7 +303,7 @@ class FileExplorer {
       .addEventListener("click", () => this.deleteSelected());
     document
       .getElementById("shutdown-btn")
-      .addEventListener("click", () => this.shutdownServer());
+      ?.addEventListener("click", () => this.shutdownServer());
 
     document
       .getElementById("file-input")
@@ -605,6 +625,18 @@ class FileExplorer {
       this.showNotification("Please enter a path", "warning");
       return;
     }
+
+    try {
+      if (
+        window.settingsManager &&
+        window.settingsManager.settings &&
+        window.settingsManager.settings.layoutMode === "explorer-only"
+      ) {
+        this.loadFiles(path);
+        this.showNotification(`Navigated to: ${path}`, "info");
+        return;
+      }
+    } catch (_) {}
 
     if (!terminalVisible) {
       console.log("Opening terminal...");
@@ -1671,6 +1703,8 @@ class SettingsManager {
       terminalFontSize: 11,
       sortBy: "name",
       sortOrder: "asc",
+      startupPath: "/home/",
+      startupCommand: "",
     };
 
     this.currentFiles = [];
@@ -1743,6 +1777,7 @@ class SettingsManager {
     );
     const mainContent = document.querySelector(".main-content");
     const app = document.getElementById("app");
+    const fileExplorer = document.querySelector(".file-explorer");
 
     if (resizeHandle && terminalWrapper) {
       resizeHandle.classList.remove(
@@ -1767,26 +1802,84 @@ class SettingsManager {
             app.appendChild(terminalWrapper);
           }
           resizeHandle.classList.add("resize-top");
+          if (fileExplorer) fileExplorer.classList.remove("hidden");
+          terminalWrapper.classList.remove("hidden");
+          terminalVisible = true;
           break;
         case "split":
           if (mainContent && !mainContent.contains(terminalWrapper)) {
             mainContent.appendChild(terminalWrapper);
           }
           resizeHandle.classList.add("resize-left");
+          if (fileExplorer) fileExplorer.classList.remove("hidden");
+          terminalWrapper.classList.remove("hidden");
+          terminalVisible = true;
           break;
         case "floating":
           if (mainContent && mainContent.contains(terminalWrapper)) {
             app.appendChild(terminalWrapper);
           }
+          if (fileExplorer) fileExplorer.classList.remove("hidden");
+          terminalWrapper.classList.remove("hidden");
+          terminalVisible = true;
+          break;
+        case "explorer-only":
+          if (fileExplorer) fileExplorer.classList.remove("hidden");
+          terminalWrapper.classList.add("hidden");
+          terminalVisible = false;
+          stopSystemStatsUpdates();
+          break;
+        case "terminal-only":
+          if (fileExplorer) fileExplorer.classList.add("hidden");
 
+          if (mainContent && !mainContent.contains(terminalWrapper)) {
+            mainContent.appendChild(terminalWrapper);
+          }
+          terminalWrapper.classList.remove("hidden");
+          terminalVisible = true;
+
+          terminalWrapper.style.flex = "1";
+          terminalWrapper.style.height = "";
+          terminalWrapper.style.width = "";
+          terminalWrapper.style.maxHeight = "none";
+          terminalWrapper.style.minHeight = "0";
+
+          const fitAfterTransition = () => {
+            try {
+              if (fitAddon && terminalVisible) fitAddon.fit();
+              if (terminal) terminal.focus();
+            } finally {
+              terminalWrapper.removeEventListener(
+                "transitionend",
+                fitAfterTransition,
+              );
+            }
+          };
+          terminalWrapper.addEventListener(
+            "transitionend",
+            fitAfterTransition,
+            { once: true },
+          );
+
+          requestAnimationFrame(() => {
+            if (!terminal) {
+              openTerminal();
+            }
+            if (fitAddon) {
+              setTimeout(() => fitAddon.fit(), 50);
+              setTimeout(() => fitAddon.fit(), 250);
+            }
+          });
           break;
       }
 
-      terminalWrapper.classList.remove("hidden");
+      if (layoutMode !== "explorer-only") {
+        terminalWrapper.classList.remove("hidden");
+      }
     }
 
     setTimeout(() => {
-      if (terminal && fitAddon) {
+      if (layoutMode !== "explorer-only" && terminal && fitAddon) {
         fitAddon.fit();
       }
     }, 100);
@@ -1997,14 +2090,6 @@ class SettingsManager {
     return iconMap[ext] || "fa-file";
   }
 
-  formatFileSize(bytes) {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB", "TB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  }
-
   hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
@@ -2020,6 +2105,7 @@ class SettingsManager {
     this.initializeLayoutButton();
     this.initializeSortControls();
     this.initializeTerminalSettings();
+    this.initializeSettingsDropdown();
   }
 
   initializeLayoutButton() {
@@ -2033,7 +2119,13 @@ class SettingsManager {
   }
 
   cycleLayout() {
-    const layouts = ["integrated", "split", "floating"];
+    const layouts = [
+      "integrated",
+      "split",
+      "floating",
+      "explorer-only",
+      "terminal-only",
+    ];
     const currentIndex = layouts.indexOf(this.settings.layoutMode);
     const nextIndex = (currentIndex + 1) % layouts.length;
     this.settings.layoutMode = layouts[nextIndex];
@@ -2050,12 +2142,16 @@ class SettingsManager {
       integrated: "fas fa-window-restore",
       split: "fas fa-columns",
       floating: "fas fa-external-link-alt",
+      "explorer-only": "fas fa-folder",
+      "terminal-only": "fas fa-terminal",
     };
 
     const titles = {
       integrated: "Layout: Integrated Terminal",
       split: "Layout: Split View",
       floating: "Layout: Floating Terminal",
+      "explorer-only": "Layout: Explorer Only",
+      "terminal-only": "Layout: Terminal Only",
     };
 
     const icon = layoutBtn.querySelector("i");
@@ -2240,6 +2336,49 @@ class SettingsManager {
       }
     }
   }
+
+  initializeSettingsDropdown() {
+    const dropdown = document.getElementById("settings-dropdown");
+    const button = document.getElementById("settings-btn");
+    const menu = document.getElementById("settings-menu");
+    const startupPathInput = document.getElementById("startup-path-input");
+    const startupCommandInput = document.getElementById(
+      "startup-command-input",
+    );
+
+    if (!dropdown || !button || !menu) return;
+
+    if (startupPathInput)
+      startupPathInput.value = this.settings.startupPath || "";
+    if (startupCommandInput)
+      startupCommandInput.value = this.settings.startupCommand || "";
+
+    button.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle("open");
+    });
+
+    menu.addEventListener("click", (e) => e.stopPropagation());
+    menu.addEventListener("mousedown", (e) => e.stopPropagation());
+    menu.addEventListener("keydown", (e) => e.stopPropagation());
+
+    document.addEventListener("click", (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove("open");
+      }
+    });
+
+    const commit = () => {
+      this.settings.startupPath = (startupPathInput?.value || "").trim();
+      this.settings.startupCommand = (startupCommandInput?.value || "").trim();
+      this.saveSettings();
+    };
+
+    startupPathInput?.addEventListener("change", commit);
+    startupPathInput?.addEventListener("blur", commit);
+    startupCommandInput?.addEventListener("change", commit);
+    startupCommandInput?.addEventListener("blur", commit);
+  }
 }
 
 let settingsManager;
@@ -2248,4 +2387,17 @@ document.addEventListener("DOMContentLoaded", () => {
   window.fileExplorer = new FileExplorer();
   window.settingsManager = new SettingsManager();
   settingsManager = window.settingsManager;
+
+  try {
+    const { startupPath } = settingsManager.settings || {};
+    if (startupPath) {
+      window.fileExplorer.loadFiles(startupPath);
+      const pathInput = document.getElementById("path-input");
+      if (pathInput) pathInput.value = startupPath;
+
+      setTimeout(() => {
+        openTerminal();
+      }, 600);
+    }
+  } catch (_) {}
 });

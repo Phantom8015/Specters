@@ -742,7 +742,6 @@ body {
   background: var(--bg-hover);
 }
 
-
 .docker-step {
   display: flex;
   align-items: flex-start;

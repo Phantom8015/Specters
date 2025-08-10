@@ -83,13 +83,32 @@
           <button id="delete-btn" class="toolbar-btn" title="Delete" disabled>
             <i class="fas fa-trash"></i>
           </button>
-          <button
-            id="shutdown-btn"
-            class="toolbar-btn btn-shutdown"
-            title="Turn Off Server"
+          <div
+            class="custom-sort-dropdown settings-dropdown"
+            id="settings-dropdown"
           >
-            <i class="fas fa-power-off"></i>
-          </button>
+            <button id="settings-btn" class="toolbar-btn" title="Settings">
+              <i class="fas fa-cog"></i>
+            </button>
+            <div class="custom-sort-menu settings-menu" id="settings-menu">
+              <div class="settings-row">
+                <label for="startup-path-input">Startup path</label>
+                <input
+                  id="startup-path-input"
+                  type="text"
+                  placeholder="/home/userland"
+                />
+              </div>
+              <div class="settings-row">
+                <label for="startup-command-input">Startup command</label>
+                <input
+                  id="startup-command-input"
+                  type="text"
+                  placeholder="e.g. ls -la"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
