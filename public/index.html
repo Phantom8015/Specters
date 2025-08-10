@@ -303,7 +303,28 @@
         <div class="modal-content modal-large">
           <div class="modal-header">
             <h3 id="preview-title">File Preview</h3>
-            <button class="modal-close">&times;</button>
+            <div class="modal-header-right">
+              <div
+                id="preview-actions"
+                style="display: flex; gap: 8px; align-items: center"
+              >
+                <button
+                  id="preview-download-btn"
+                  class="btn btn-sm btn-secondary"
+                  title="Download File"
+                >
+                  <i class="fas fa-download"></i>
+                </button>
+                <button
+                  id="preview-edit-btn"
+                  class="btn btn-sm btn-secondary"
+                  title="Edit File"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+              </div>
+              <button class="modal-close">&times;</button>
+            </div>
           </div>
           <div class="modal-body">
             <div id="preview-content"></div>

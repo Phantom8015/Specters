@@ -52,8 +52,8 @@ function openTerminal() {
   if (!terminal) {
     terminal = new window.Terminal({
       cursorBlink: true,
-      cursorStyle: "block",
       cursorInactiveStyle: "outline",
+      cursorWidth: 1,
       theme: {
         background: "#12141b",
         foreground: "#d4d4d4",
@@ -200,11 +200,12 @@ function initializeTerminalResize() {
       terminalWrapper.style.width = `${newWidth}px`;
     } else {
       const deltaY = startY - e.clientY;
-      const newHeight = Math.max(
-        150,
-        Math.min(window.innerHeight * 0.7, initialHeight + deltaY),
-      );
+
+      const maxH = window.innerHeight * 0.7;
+      const newHeight = Math.max(150, Math.min(maxH, initialHeight + deltaY));
       terminalWrapper.style.height = `${newHeight}px`;
+
+      terminalWrapper.dataset.restoredHeight = terminalWrapper.style.height;
     }
 
     if (terminal && fitAddon) {
@@ -391,20 +392,70 @@ class FileExplorer {
 
   initializeModals() {
     document.querySelectorAll(".modal-close").forEach((btn) => {
-      btn.addEventListener("click", (e) =>
-        e.target.closest(".modal").classList.add("hidden"),
-      );
+      btn.addEventListener("click", (e) => {
+        const modal = e.target.closest(".modal");
+        if (!modal) return;
+        modal.classList.add("hidden");
+        if (modal.id === "editor-modal") {
+          this.teardownEditorHotkey();
+        }
+        if (modal.id === "preview-modal") {
+          const textElement = document
+            .getElementById("preview-content")
+            ?.querySelector(".preview-text-content");
+          if (textElement && textElement._previewSaveHandler) {
+            document.removeEventListener(
+              "keydown",
+              textElement._previewSaveHandler,
+            );
+            delete textElement._previewSaveHandler;
+          }
+        }
+      });
     });
 
     document
       .getElementById("save-file-btn")
       .addEventListener("click", this.saveFile.bind(this));
 
+    const editorModal = document.getElementById("editor-modal");
+    if (editorModal) {
+      editorModal.addEventListener("click", (e) => {});
+      const observer = new MutationObserver(() => {
+        const isOpen = !editorModal.classList.contains("hidden");
+        if (isOpen) this.setupEditorHotkey();
+        else this.teardownEditorHotkey();
+      });
+      observer.observe(editorModal, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+      editorModal._observer = observer;
+    }
+
     document.querySelectorAll(".modal").forEach((modal) => {
       modal.addEventListener("click", (e) => {
         if (e.target === modal) modal.classList.add("hidden");
       });
     });
+  }
+
+  setupEditorHotkey() {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        this.saveFile();
+      }
+    };
+    document.addEventListener("keydown", handler);
+    this._editorSaveHandler = handler;
+  }
+
+  teardownEditorHotkey() {
+    if (this._editorSaveHandler) {
+      document.removeEventListener("keydown", this._editorSaveHandler);
+      this._editorSaveHandler = null;
+    }
   }
 
   preventDefaults(e) {
@@ -560,13 +611,17 @@ class FileExplorer {
   updateToolbar() {
     const hasSelection = this.selectedFiles.size > 0;
     const hasClipboard = this.clipboard.items.length > 0;
-    const hasSingleFileSelection =
-      this.selectedFiles.size === 1 &&
-      !document.querySelector(
-        `[data-path="${Array.from(this.selectedFiles)[0]}"]`,
-      )?.dataset.isDirectory;
+    const hasSingleFileSelection = this.selectedFiles.size === 1;
+    const firstPath = hasSingleFileSelection
+      ? Array.from(this.selectedFiles)[0]
+      : null;
+    const firstItem = firstPath
+      ? document.querySelector(`[data-path="${firstPath}"]`)
+      : null;
+    const firstIsDir = firstItem?.dataset.isDirectory === "true";
 
-    document.getElementById("preview-btn").disabled = !hasSingleFileSelection;
+    document.getElementById("preview-btn").disabled =
+      !hasSingleFileSelection || firstIsDir;
     document.getElementById("download-btn").disabled = !hasSelection;
     document.getElementById("copy-btn").disabled = !hasSelection;
     document.getElementById("cut-btn").disabled = !hasSelection;
@@ -1102,6 +1157,9 @@ class FileExplorer {
     const modal = document.getElementById("preview-modal");
     const title = document.getElementById("preview-title");
     const content = document.getElementById("preview-content");
+    const actions = document.getElementById("preview-actions");
+    const downloadBtn = document.getElementById("preview-download-btn");
+    const editBtn = document.getElementById("preview-edit-btn");
 
     const fileName = filePath.split("/").pop();
     const fileExt = fileName.split(".").pop()?.toLowerCase();
@@ -1168,7 +1226,9 @@ class FileExplorer {
       return;
     }
 
-    title.textContent = `Preview: ${fileName}`;
+    title.textContent =
+      fileName.length > 20 ? `${fileName.slice(0, 17)}...` : fileName;
+    title.title = fileName;
     content.innerHTML = "";
     modal.classList.remove("hidden");
 
@@ -1181,6 +1241,11 @@ class FileExplorer {
         img.onerror = () =>
           this.showNotification("Failed to load image", "error");
         content.appendChild(img);
+        if (actions) actions.style.display = "flex";
+        if (downloadBtn)
+          downloadBtn.onclick = () =>
+            window.open(`/api/download?path=${encodeURIComponent(filePath)}`);
+        if (editBtn) editBtn.style.display = "none";
       } else if (isVideo) {
         const video = document.createElement("video");
         video.className = "preview-video";
@@ -1189,6 +1254,11 @@ class FileExplorer {
         video.onerror = () =>
           this.showNotification("Failed to load video", "error");
         content.appendChild(video);
+        if (actions) actions.style.display = "flex";
+        if (downloadBtn)
+          downloadBtn.onclick = () =>
+            window.open(`/api/download?path=${encodeURIComponent(filePath)}`);
+        if (editBtn) editBtn.style.display = "none";
       } else if (isAudio) {
         const audio = document.createElement("audio");
         audio.className = "preview-audio";
@@ -1197,6 +1267,11 @@ class FileExplorer {
         audio.onerror = () =>
           this.showNotification("Failed to load audio", "error");
         content.appendChild(audio);
+        if (actions) actions.style.display = "flex";
+        if (downloadBtn)
+          downloadBtn.onclick = () =>
+            window.open(`/api/download?path=${encodeURIComponent(filePath)}`);
+        if (editBtn) editBtn.style.display = "none";
       } else {
         const response = await fetch(
           `/api/file-content?path=${encodeURIComponent(filePath)}`,
@@ -1210,6 +1285,14 @@ class FileExplorer {
         }
 
         this.renderTextPreview(data.content, fileName, filePath);
+        if (actions) actions.style.display = "flex";
+        if (downloadBtn)
+          downloadBtn.onclick = () =>
+            window.open(`/api/download?path=${encodeURIComponent(filePath)}`);
+        if (editBtn) {
+          editBtn.style.display = "inline-flex";
+          editBtn.onclick = () => this.togglePreviewEdit(filePath);
+        }
       }
     } catch (err) {
       this.showNotification("Network error occurred", "error");
@@ -1219,23 +1302,6 @@ class FileExplorer {
 
   renderTextPreview(content, fileName, filePath) {
     const container = document.getElementById("preview-content");
-
-    const fileInfo = document.createElement("div");
-    fileInfo.className = "preview-file-info";
-    fileInfo.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h4>${fileName}</h4>
-                <div style="display: flex; gap: 8px;">
-                    <button id="preview-download-btn" class="btn btn-sm btn-secondary" title="Download File">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button id="preview-edit-btn" class="btn btn-sm btn-secondary" title="Edit File">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-    container.appendChild(fileInfo);
 
     const previewDiv = document.createElement("div");
     const fileExt = fileName.split(".").pop()?.toLowerCase();
@@ -1296,12 +1362,6 @@ class FileExplorer {
 
     previewDiv.appendChild(textElement);
     container.appendChild(previewDiv);
-
-    const downloadBtn = document.getElementById("preview-download-btn");
-    const editBtn = document.getElementById("preview-edit-btn");
-    downloadBtn.onclick = () =>
-      window.open(`/api/download?path=${encodeURIComponent(filePath)}`);
-    editBtn.onclick = () => this.togglePreviewEdit(filePath);
   }
 
   togglePreviewEdit(filePath) {
@@ -1328,6 +1388,15 @@ class FileExplorer {
 
       editBtn.parentNode.insertBefore(cancelBtn, editBtn);
       cancelBtn.id = "preview-cancel-btn";
+
+      const keyHandler = (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+          e.preventDefault();
+          this.savePreviewChanges(filePath, textElement.value);
+        }
+      };
+      document.addEventListener("keydown", keyHandler);
+      textElement._previewSaveHandler = keyHandler;
     } else {
       this.savePreviewChanges(filePath, textElement.value);
     }
@@ -1351,6 +1420,11 @@ class FileExplorer {
 
     if (cancelBtn) {
       cancelBtn.remove();
+    }
+
+    if (textElement && textElement._previewSaveHandler) {
+      document.removeEventListener("keydown", textElement._previewSaveHandler);
+      delete textElement._previewSaveHandler;
     }
   }
 
@@ -1391,6 +1465,16 @@ class FileExplorer {
 
       if (cancelBtn) {
         cancelBtn.remove();
+      }
+
+      const previewDiv = document.querySelector(".preview-text, .preview-code");
+      const textElement = previewDiv?.querySelector(".preview-text-content");
+      if (textElement && textElement._previewSaveHandler) {
+        document.removeEventListener(
+          "keydown",
+          textElement._previewSaveHandler,
+        );
+        delete textElement._previewSaveHandler;
       }
     }
   }
@@ -1725,15 +1809,17 @@ class SettingsManager {
     this.applySettings();
   }
 
-  saveSettings() {
+  saveSettings(options = {}) {
     localStorage.setItem("fileExplorerSettings", JSON.stringify(this.settings));
-    this.applySettings();
+    this.applySettings(options);
   }
 
-  applySettings() {
+  applySettings(options = {}) {
     this.applyAccentColor();
 
-    this.applyLayout();
+    if (options.applyLayout !== false) {
+      this.applyLayout();
+    }
 
     this.applyTerminalSettings();
 
@@ -1805,6 +1891,11 @@ class SettingsManager {
           if (fileExplorer) fileExplorer.classList.remove("hidden");
           terminalWrapper.classList.remove("hidden");
           terminalVisible = true;
+
+          if (!terminalWrapper.style.height) {
+            terminalWrapper.style.height =
+              terminalWrapper.dataset.restoredHeight || "300px";
+          }
           break;
         case "split":
           if (mainContent && !mainContent.contains(terminalWrapper)) {
@@ -1883,6 +1974,14 @@ class SettingsManager {
         fitAddon.fit();
       }
     }, 100);
+
+    if (app) {
+      app.classList.remove("mode-pop");
+
+      void app.offsetWidth;
+      app.classList.add("mode-pop");
+      setTimeout(() => app.classList.remove("mode-pop"), 220);
+    }
   }
 
   applyTerminalSettings() {
@@ -2185,7 +2284,8 @@ class SettingsManager {
           item.classList.add("selected");
 
           this.settings.sortBy = item.dataset.value;
-          this.saveSettings();
+
+          this.saveSettings({ applyLayout: false });
           this.updateSortButton();
           this.applySorting();
 
@@ -2202,12 +2302,17 @@ class SettingsManager {
       sortOrderBtn.addEventListener("click", () => {
         this.settings.sortOrder =
           this.settings.sortOrder === "asc" ? "desc" : "asc";
-        this.saveSettings();
+
+        this.saveSettings({ applyLayout: false });
         this.updateSortOrderButton();
         this.applySorting();
       });
       this.updateSortOrderButton();
     }
+  }
+
+  applySorting() {
+    this.applyExplorerSettings();
   }
 
   updateSortOrderButton() {
