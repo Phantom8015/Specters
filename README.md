@@ -1,10 +1,12 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/Phantom8015/Specters/refs/heads/main/website/favicon.png" width="150" height="150"/>
+<img src="https://raw.githubusercontent.com/Phantom8015/Bekter/refs/heads/main/website/favicon.png" width="150" height="150"/>
 </p>
-<h1 align="center">Specters</h1>
-<p align="center">Specters is a powerful web-based file explorer with terminal integration, system monitoring, and modern UI. Built with Node.js and designed for efficiency and ease of use.</p>
+<h1 align="center">Bekter</h1>
+<p align="center">Bekter is a powerful web-based file explorer with terminal integration, system monitoring, and modern UI. Built with Node.js and designed for efficiency and ease of use.</p>
 
 Note: This has not been tested outside of Ubuntu/Debian. Stability is not guaranteed if you are not using them.
+Another note: This was called Specters before. I don't want to buy another domain for another project. So say hi to Bekters.
+
 
 ## Features
 
@@ -19,13 +21,13 @@ Note: This has not been tested outside of Ubuntu/Debian. Stability is not guaran
 
 ### Docker (Recommended)
 
-The easiest way to run Specters is using Docker:
+The easiest way to run Bekter is using Docker:
 
 #### Using Docker Compose
 Run commands as root if you experience permission issues.
 
 ```bash
-curl -o docker-compose.yml https://raw.githubusercontent.com/Phantom8015/Specters/main/docker-compose.yml
+curl -o docker-compose.yml https://raw.githubusercontent.com/Phantom8015/Bekter/main/docker-compose.yml
 nano docker-compose.yml
 docker-compose up -d
 ```
@@ -34,18 +36,18 @@ docker-compose up -d
 
 **Basic usage:**
 ```bash
-docker run -p 3000:3000 phantom8016/specters:latest
+docker run -p 3000:3000 phantom8016/Bekter:latest
 ```
 
 **Production setup with volume mounts:**
 ```bash
 docker run -d \
-  --name specters \
+  --name Bekter \
   -p 3000:3000 \
   -v /home:/app/managed/home:rw \
   -v /var/log:/app/managed/logs:ro \
   --restart unless-stopped \
-  phantom8016/specters:latest
+  phantom8016/Bekter:latest
 ```
 
 ### Traditional Installation
@@ -53,7 +55,7 @@ docker run -d \
 #### Quick Install Script
 **On your server:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Phantom8015/Specters/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Phantom8015/Bekter/main/install.sh | bash
 ```
 
 **On your PC:**
@@ -73,8 +75,8 @@ curl -fsSL https://raw.githubusercontent.com/Phantom8015/Specters/main/install.s
 ### On your server:
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Phantom8015/Specters.git
-   cd Specters
+   git clone https://github.com/Phantom8015/Bekter.git
+   cd Bekter
    ```
 
 2. **Install dependencies**
@@ -82,7 +84,7 @@ curl -fsSL https://raw.githubusercontent.com/Phantom8015/Specters/main/install.s
    npm i
    ```
 
-3. **Start Specters**
+3. **Start Bekter**
    ```bash
    npm start
    ```
@@ -113,6 +115,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## Issues & Support
 
-- **Issues**: [GitHub Issues](https://github.com/Phantom8015/Specters/issues)
+- **Issues**: [GitHub Issues](https://github.com/Phantom8015/Bekter/issues)
 - **Contact**: [Phantom8015](https://github.com/Phantom8015)
 
