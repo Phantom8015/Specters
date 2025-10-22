@@ -25,6 +25,16 @@ Log in with Google.
 Once logged in, a user can input a subject or question they have into the "What do you wanna learn?" input.
 After they press enter, a course gets generated.
 
+# How can I run Specters on my own machine?
+
+Specters is hosted on https://specters.dev
+
+But if you want it on your own machine, then:
+1. Run this in your terminal: `git clone https://github.com/Phantom8015/Specters` 
+2. Once cloned, make sure Python is installed (`python --version`)
+3. Then, configure your environment variables in a new file called `.env`. An example has been provided.
+4. Lastly, cd into the `api` folder and run `python index.py`
+
 ## It's that easy!
 
 ###### Note: Specters is not the original name. It's the only one I had a domain for. This was meant to be called Dyscover
