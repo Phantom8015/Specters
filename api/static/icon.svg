@@ -1,0 +1,11 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <g fill="white" transform="translate(100,100)">
+    <path d="M0,-50a25,25 0 1,1 0,50a25,25 0 1,1 0,-50zm0,-30c-10,0-25,15-25,25s15,5,25,5s25,5,25,-5s-15,-25-25,-25z"/>
+    <use href="#taurus" transform="rotate(90)" />
+    <use href="#taurus" transform="rotate(180)" />
+    <use href="#taurus" transform="rotate(270)" />
+  </g>
+  <defs>
+    <path id="taurus" d="M0,-50a25,25 0 1,1 0,50a25,25 0 1,1 0,-50zm0,-30c-10,0-25,15-25,25s15,5,25,5s25,5,25,-5s-15,-25-25,-25z"/>
+  </defs>
+</svg>

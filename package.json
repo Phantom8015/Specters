@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "tailwind-svg-import": "^0.4.0"
+  }
+}

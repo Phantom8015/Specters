@@ -1,0 +1,594 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        user-select: none;
+      }
+      :root {
+        --scroll-thumb: rgba(255, 255, 255, 0.2);
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        background:
+          radial-gradient(
+            circle at 15% 25%,
+            rgba(138, 95, 30, 0.3) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 85% 15%,
+            rgba(235, 37, 37, 0.2) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 45% 75%,
+            rgba(216, 113, 29, 0.25) 0%,
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 75% 85%,
+            rgba(175, 158, 30, 0.2) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 25% 65%,
+            rgba(246, 59, 59, 0.15) 0%,
+            transparent 35%
+          ),
+          linear-gradient(135deg, #000 0%, #190f0f 50%, #140c00 100%);
+        background-attachment: fixed;
+        color: white;
+        font-size: 13px;
+      }
+      .app {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+        position: relative;
+      }
+      .animated-title {
+        background: linear-gradient(
+          90deg,
+          rgb(237, 153, 153),
+          rgb(241, 199, 144),
+          rgb(246, 241, 144),
+          rgb(240, 177, 117)
+        );
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: balls 3s ease-in-out infinite;
+      }
+      @keyframes balls {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      .fade-in {
+        animation: fadeIn 0.4s ease-in-out forwards;
+        opacity: 0;
+      }
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.03) 0%,
+          rgba(255, 255, 255, 0.08) 50%,
+          rgba(255, 255, 255, 0.03) 100%
+        );
+        background-size: 200% 100%;
+        animation: skeleton-wave 1.8s ease-in-out infinite;
+        border-radius: 0.5rem;
+      }
+      @keyframes skeleton-wave {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      .skeleton-text {
+        height: 1rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.05) 0%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.05) 100%
+        );
+        background-size: 200% 100%;
+        animation: skeleton-wave 1.8s ease-in-out infinite;
+        border-radius: 0.25rem;
+      }
+      .code-block-wrapper {
+        position: relative;
+        margin: 12px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        padding-right: 48px;
+      }
+      pre {
+        background: none;
+        border: none;
+        padding: 12px;
+        margin: 0;
+        overflow-x: auto;
+        font-family:
+          "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+          "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        color: white;
+      }
+      code {
+        font-family: inherit;
+      }
+      p code,
+      div code,
+      li code {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(6px);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        color: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .question-wrapper {
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          transparent
+        );
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease;
+      }
+      .q-enter {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      .q-enter.q-enter-active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .opt-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: transparent;
+        cursor: pointer;
+        transition:
+          background 0.12s,
+          border-color 0.12s;
+      }
+      .opt-btn:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .opt-correct {
+        border-color: rgba(34, 197, 94, 0.65);
+      }
+      .opt-wrong {
+        border-color: rgba(239, 68, 68, 0.65);
+      }
+      .q-correct {
+        border-color: rgba(34, 197, 94, 0.65);
+      }
+      .q-wrong {
+        border-color: rgba(239, 68, 68, 0.65);
+      }
+      .explain {
+        margin-top: 8px;
+        padding: 8px;
+        border-radius: 6px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          transparent
+        );
+        color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: all 0.22s ease;
+      }
+      .explain.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .sidebar {
+        width: 18rem;
+        min-width: 18rem;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        background: rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(8px);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        transition: transform 0.3s ease;
+        z-index: 100;
+      }
+      .sidebar.collapsed {
+        transform: translateX(-100%);
+      }
+      .sidebar-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .sidebar-toggle {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 101;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .sidebar-toggle:hover {
+        background: rgba(0, 0, 0, 0.6);
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .sidebar-overlay.active {
+        opacity: 1;
+      }
+      .sidebar-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+      }
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+      }
+      .pill {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 48rem;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(8px);
+        border-radius: 9999px;
+        padding: 8px 14px;
+        margin-bottom: 16px;
+      }
+      .controls-center {
+        flex: 1;
+        text-align: center;
+      }
+      .parts-btn {
+        width: 100%;
+        text-align: left;
+        border-radius: 8px;
+        padding: 8px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+        transition:
+          background 0.12s,
+          border-color 0.12s;
+      }
+      .parts-btn.active {
+        border-color: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.02);
+        color: white;
+      }
+      .main-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+      }
+      .code-block-wrapper .-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.45);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--scroll-thumb);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      html {
+        scrollbar-width: thin;
+        scrollbar-color: var(--scroll-thumb) transparent;
+      }
+      .content-section img {
+        max-width: 100%;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .disabled-opt {
+        pointer-events: none;
+        opacity: 0.85;
+      }
+      .retry-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-self: center;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(239, 68, 68, 0.18);
+        background: rgba(239, 68, 68, 0.06);
+        color: rgba(239, 68, 68, 0.9);
+        cursor: pointer;
+        transition:
+          transform 0.12s,
+          opacity 0.12s;
+      }
+      .retry-btn:hover {
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+      }
+      .hidden {
+        display: none;
+      }
+      .complete-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-self: center;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(34, 197, 94, 0.18);
+        background: rgba(34, 197, 94, 0.06);
+        color: rgba(34, 197, 94, 0.9);
+        cursor: pointer;
+        transition:
+          transform 0.12s,
+          opacity 0.12s;
+      }
+      .complete-btn:hover {
+        background: rgba(34, 197, 94, 0.9);
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          font-size: 14px;
+        }
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 80%;
+          max-width: 18rem;
+          box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar.collapsed {
+          transform: translateX(-100%);
+        }
+        .sidebar-overlay {
+          display: block;
+        }
+        .main {
+          width: 100%;
+        }
+        .pill {
+          padding: 6px 10px;
+          font-size: 13px;
+        }
+        .topbar {
+          padding: 8px 12px;
+        }
+        #partTitle {
+          font-size: 13px;
+        }
+        .main-scroll {
+          padding: 16px 12px;
+        }
+        .question-wrapper {
+          padding: 10px;
+        }
+        .opt-btn {
+          padding: 8px;
+          font-size: 13px;
+        }
+        .code-block-wrapper pre {
+          font-size: 12px;
+          padding: 10px;
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+      }
+
+      @media (min-width: 769px) {
+        .sidebar-toggle {
+          display: none;
+        }
+        .sidebar-overlay {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      id="sidebarToggle"
+      class="sidebar-toggle"
+      aria-label="Toggle Sidebar"
+    >
+      <i class="fa fa-bars"></i>
+    </button>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <div class="app">
+      <div id="sidebar" class="sidebar">
+        <div class="sidebar-head">
+          <button
+            id="homeBtn"
+            style="
+              border: 1px solid rgba(255, 255, 255, 0.04);
+              background: rgba(0, 0, 0, 0.12);
+              padding: 6px;
+              border-radius: 8px;
+            "
+          >
+            <img
+              src="/static/icon.svg"
+              alt="Home"
+              style="width: 28px; height: 28px"
+            />
+          </button>
+          <h2
+            id="courseTitle"
+            class="animated-title"
+            style="
+              font-size: 14px;
+              font-weight: 600;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            "
+          ></h2>
+        </div>
+        <div id="parts" class="sidebar-scroll"></div>
+      </div>
+
+      <div id="main" class="main">
+        <div class="topbar">
+          <div class="pill" style="width: 100%; max-width: 48rem">
+            <button
+              id="backBtn"
+              aria-label="Back"
+              style="
+                background: transparent;
+                border: none;
+                color: rgba(255, 255, 255, 0.75);
+                padding: 6px 10px;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              <i class="fa fa-chevron-left"></i>
+            </button>
+            <div class="controls-center">
+              <span
+                id="partTitle"
+                style="font-weight: 600; color: rgba(255, 255, 255, 0.95)"
+              ></span>
+            </div>
+            <button
+              id="nextBtn"
+              aria-label="Next"
+              style="
+                background: transparent;
+                border: none;
+                color: rgba(255, 255, 255, 0.75);
+                padding: 6px 10px;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <div id="contentWrapper" class="main-scroll">
+          <div
+            id="courseContent"
+            style="
+              max-width: 48rem;
+              margin: 0 auto;
+              color: rgba(255, 255, 255, 0.9);
+              line-height: 1.55;
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="../static/course-viewer.js"></script>
+  </body>
+</html>

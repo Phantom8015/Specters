@@ -1,0 +1,418 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="../static/icon.svg"
+      sizes="any"
+      type="image/svg+xml"
+    />
+    <style>
+      * {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .coolfont {
+        font-family: Georgia, sans-serif;
+        background: linear-gradient(
+          90deg,
+          rgb(237, 153, 153),
+          rgb(241, 199, 144),
+          rgb(246, 241, 144),
+          rgb(240, 177, 117)
+        );
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: balls 3s ease-in-out infinite;
+      }
+      @keyframes balls {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        background:
+          radial-gradient(
+            circle at 15% 25%,
+            rgba(138, 95, 30, 0.3) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 85% 15%,
+            rgba(235, 37, 37, 0.2) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 45% 75%,
+            rgba(216, 113, 29, 0.25) 0%,
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 75% 85%,
+            rgba(175, 158, 30, 0.2) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 25% 65%,
+            rgba(246, 59, 59, 0.15) 0%,
+            transparent 35%
+          ),
+          linear-gradient(135deg, #000 0%, #190f0f 50%, #140c00 100%);
+        background-attachment: fixed;
+        color: white;
+        font-size: 15px;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-size: 400% 400%;
+        animation: bgMove 40s ease-in-out infinite;
+      }
+      @keyframes bgMove {
+        0%,
+        100% {
+          background-position: 0% 0%;
+        }
+        50% {
+          background-position: 100% 100%;
+        }
+      }
+
+      .carousel {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 1.25rem;
+        padding: 1.25rem 0;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+      }
+      .carousel::-webkit-scrollbar {
+        height: 6px;
+      }
+      .carousel::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+      }
+
+      .course-card {
+        min-width: 270px;
+        scroll-snap-align: start;
+        cursor: pointer;
+        position: relative;
+        border-radius: 0.375rem;
+        overflow: hidden;
+        transition:
+          transform 0.3s ease,
+          border 0.3s ease;
+      }
+
+      .course-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 2px;
+        background: linear-gradient(
+          90deg,
+          rgb(237, 153, 153),
+          rgb(241, 199, 144),
+          rgb(246, 241, 144),
+          rgb(240, 177, 117)
+        );
+        background-size: 300% 300%;
+        opacity: 0;
+        transition:
+          opacity 0.4s ease,
+          background-position 3s ease-in-out;
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+      .course-card:hover::before {
+        opacity: 1;
+        animation: borderFlow 3s ease-in-out infinite;
+      }
+      @keyframes borderFlow {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.03) 0%,
+          rgba(255, 255, 255, 0.08) 50%,
+          rgba(255, 255, 255, 0.03) 100%
+        );
+        background-size: 200% 100%;
+        animation: skeleton-wave 1.8s ease-in-out infinite;
+        border-radius: 0.5rem;
+      }
+      @keyframes skeleton-wave {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      .skeleton-text {
+        height: 1rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.05) 0%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.05) 100%
+        );
+        background-size: 200% 100%;
+        animation: skeleton-wave 1.8s ease-in-out infinite;
+        border-radius: 0.25rem;
+      }
+
+      .fade {
+        opacity: 0;
+        transition: opacity 0.6s ease;
+      }
+      .fade.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="main_content"
+      class="flex items-center justify-center h-screen flex-col"
+    >
+      <h1 class="text-4xl justify-center mb-12 coolfont backdrop-blur-xl">
+        Specters
+      </h1>
+
+      <div id="authSection" class="w-3/4 max-w-3xl mb-8 hidden">
+        <button
+          id="loginBtn"
+          class="w-full border-white/[0.05] shadow-inner shadow-black/[0.5] hover:shadow-md hover:shadow-black/[0.3] border bg-black/[0.1] backdrop-blur-lg text-white/[0.8] hover:text-black rounded-full py-4 px-8 transition-all duration-300 ease-in-out text-base relative overflow-hidden group"
+        >
+          <span
+            class="absolute inset-0 bg-gradient-to-r from-[rgb(237,153,153)] via-[rgb(241,199,144)] to-[rgb(240,177,117)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
+          ></span>
+          <span class="relative z-10"
+            ><i class="fab fa-google mr-2"></i> Sign in with Google</span
+          >
+        </button>
+      </div>
+
+      <div
+        id="userSection"
+        class="w-3/4 max-w-3xl mb-8 flex flex-col items-start space-y-4 hidden"
+      >
+        <div
+          class="flex items-center justify-between bg-black/[0.1] backdrop-blur-xl border border-white/[0.05] rounded-full py-3 px-6 w-full"
+        >
+          <div class="flex items-center">
+            <img id="userPicture" src="" class="w-10 h-10 rounded-full mr-3" />
+            <span id="userName" class="text-white/[0.8] text-base"></span>
+          </div>
+          <button
+            id="logoutBtn"
+            class="bg-red-500/[0.1] hover:bg-red-500/[0.5] border border-red-500/[0.1] text-white rounded-full py-1.5 px-4 text-sm transition duration-300"
+          >
+            <i class="fa fa-sign-out-alt mr-1"></i>
+          </button>
+        </div>
+      </div>
+
+      <textarea
+        placeholder="What do you wanna learn?"
+        id="input"
+        class="p-5 sticky bg-black/[0.1] resize-none text-base outline-none backdrop-blur-xl transition-shadow duration-200 ease-in-out shadow-sm focus:shadow-lg text-white/[0.8] placeholder-white/[0.4] border border-white/[0.05] rounded-full h-18 w-3/4 max-w-3xl"
+      ></textarea>
+
+      <div id="coursesCarousel" class="w-3/4 max-w-3xl mt-10 hidden fade">
+        <h3 class="text-white/[0.6] text-sm mb-4 uppercase tracking-wider">
+          Your Courses (<span id="courseCountLabel">0</span>)
+        </h3>
+        <div class="carousel" id="coursesList"></div>
+      </div>
+
+      <div id="gcoursesCarousel" class="w-3/4 max-w-3xl mt-10 hidden fade">
+        <h3 class="text-white/[0.6] text-sm mb-4 uppercase tracking-wider">
+          Newest Courses
+        </h3>
+        <div class="carousel" id="gcoursesList"></div>
+      </div>
+    </div>
+
+    <script>
+      let currentUser = null;
+      let userLoaded = false,
+        allLoaded = false;
+
+      const userSection = document.getElementById("userSection");
+      const coursesList = document.getElementById("coursesList");
+      const gcoursesList = document.getElementById("gcoursesList");
+      const coursesCarousel = document.getElementById("coursesCarousel");
+      const gcoursesCarousel = document.getElementById("gcoursesCarousel");
+
+      function showSkeleton(list, count = 3) {
+        list.innerHTML = Array(count)
+          .fill(0)
+          .map(
+            () => `
+          <div class="course-card bg-black/[0.2] backdrop-blur-md border border-white/[0.05] rounded-md p-5">
+            <div class="skeleton-text w-3/4"></div>
+            <div class="skeleton-text w-1/2"></div>
+          </div>`,
+          )
+          .join("");
+      }
+
+      async function checkAuth() {
+        try {
+          const res = await fetch("/api/user");
+          const data = await res.json();
+          if (data.logged_in) {
+            currentUser = data;
+            document.getElementById("authSection").classList.add("hidden");
+            userSection.classList.remove("hidden");
+            document.getElementById("userName").textContent = data.name;
+            document.getElementById("userPicture").src = data.picture;
+            document.getElementById("input").disabled = false;
+            showSkeleton(coursesList);
+            showSkeleton(gcoursesList);
+            await Promise.all([loadUserCourses(), loadAllCourses()]);
+            coursesCarousel.classList.add("show");
+            gcoursesCarousel.classList.add("show");
+          } else {
+            document.getElementById("authSection").classList.remove("hidden");
+            userSection.classList.add("hidden");
+            document.getElementById("input").disabled = true;
+            document.getElementById("input").placeholder =
+              "Sign in to start learning";
+          }
+        } catch (err) {
+          console.error("Auth check failed:", err);
+        }
+      }
+
+      async function loadUserCourses() {
+        try {
+          const res = await fetch("/api/user/courses");
+          const data = await res.json();
+          if (data.courses && data.courses.length > 0) {
+            coursesList.innerHTML = data.courses
+              .map(
+                (c) => `
+              <div class="course-card bg-black/[0.2] backdrop-blur-md border border-white/[0.05] rounded-md p-5 relative" id="course-${c.id}" onclick="window.innerWidth>768&&(window.location.href='/course?id=${c.id}')">
+                <h4 class="text-white text-base font-semibold mb-2 truncate">${c.title}</h4>
+                <p class="text-white/[0.5] text-sm">${new Date(c.created_at).toLocaleDateString()}</p>
+                <button class="absolute bottom-2 right-4 bg-red-500/[0.1] hover:bg-red-500/[0.5] border border-red-500/[0.1] text-white rounded-full py-1 px-3 text-sm transition duration-300" onclick="event.stopPropagation(); deleteCourse('${c.id}')"><i class="fa fa-trash"></i></button>
+              </div>`,
+              )
+              .join("");
+            document.getElementById("courseCountLabel").textContent =
+              data.courses.length;
+            coursesCarousel.classList.remove("hidden");
+          } else {
+            coursesList.innerHTML =
+              "<p class='text-white/[0.4]'>No courses yet.</p>";
+          }
+        } catch (err) {
+          console.error("Failed to load user courses:", err);
+        }
+      }
+
+      async function loadAllCourses() {
+        try {
+          const res = await fetch("/api/all/courses");
+          const data = await res.json();
+          if (data.courses && data.courses.length > 0) {
+            gcoursesList.innerHTML = data.courses
+              .map(
+                (c) => `
+              <div class="course-card bg-black/[0.2] backdrop-blur-md border border-white/[0.05] rounded-md p-5" onclick="window.innerWidth>768&&(window.location.href='/course?id=${c.id}')">
+                <h4 class="text-white text-base font-semibold mb-2 truncate">${c.title}</h4>
+                <p class="text-white/[0.5] text-sm">${new Date(c.created_at).toLocaleDateString()} ${c.author}</p>
+              </div>`,
+              )
+              .join("");
+            gcoursesCarousel.classList.remove("hidden");
+          } else {
+            gcoursesList.innerHTML =
+              "<p class='text-white/[0.4]'>No new courses available.</p>";
+          }
+        } catch (err) {
+          console.error("Failed to load all courses:", err);
+        }
+      }
+
+      function deleteCourse(id) {
+        if (!confirm("Are you sure?")) return;
+        fetch(`/api/course/${id}`, { method: "DELETE" })
+          .then((res) => res.json())
+          .then(() => {
+            const el = document.getElementById(`course-${id}`);
+            if (el) {
+              el.style.opacity = 0;
+              setTimeout(() => el.remove(), 300);
+            }
+            const label = document.getElementById("courseCountLabel");
+            label.textContent = parseInt(label.textContent) - 1;
+          });
+      }
+
+      document.getElementById("loginBtn").onclick = () =>
+        (window.location.href = "/login");
+      document.getElementById("logoutBtn").onclick = () =>
+        (window.location.href = "/logout");
+
+      const textarea = document.getElementById("input");
+      textarea.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          if (window.innerWidth <= 768) return;
+          const content = textarea.value.trim();
+          if (!content || !currentUser) return;
+          window.location.href = `/course?prompt=${encodeURIComponent(content)}`;
+        }
+      });
+
+      if (window.innerWidth <= 768) {
+        textarea.disabled = true;
+        textarea.placeholder = "Unusable on mobile.";
+      }
+
+      checkAuth();
+    </script>
+  </body>
+</html>

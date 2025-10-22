@@ -1,0 +1,9 @@
+flask
+Flask[async]
+flask_limiter
+google-generativeai
+google
+google-genai
+pymongo
+authlib
+dotenv
