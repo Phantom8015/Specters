@@ -10,6 +10,8 @@ import os
 from datetime import datetime
 from bson import ObjectId
 from dotenv import load_dotenv
+from bson.objectid import ObjectId
+
 
 load_dotenv()
 
@@ -26,7 +28,7 @@ mongo_client = MongoClient(os.getenv("URI"))
 db = mongo_client['coursegen']
 courses_collection = db['courses']
 users_collection = db['users']
-
+progress_collection = db['progress']
 
 oauth = OAuth(app)
 google = oauth.register(
@@ -80,7 +82,69 @@ Remember: Respond with ONLY ```json [your json array here] ``` and nothing else.
     
     response = client.generate_content(prompt)
     return response.text
+@app.route("/api/course/<course_id>/progress", methods=["GET", "POST", "DELETE"])
+def course_progress(course_id):
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Not logged in"}), 401
+    try:
+        oid = ObjectId(course_id)
+    except Exception:
+        return jsonify({"error": "Invalid course ID"}), 400
+    if request.method == "GET":
+        doc = progress_collection.find_one({
+            "course_id": oid,
+            "user_email": user['email']
+        })
+        if not doc:
+            return jsonify({"progress": None}), 200
 
+        course_doc = courses_collection.find_one({"_id": oid})
+        if not course_doc:
+            return jsonify({"error": "Course not found"}), 404
+
+        try:
+            course_data = json.loads(course_doc['course_data'])
+            total_parts = len(course_data.get('c', []))
+        except Exception:
+            total_parts = 0
+
+        progress = doc.get("progress", {})
+        completed_parts = len(progress.get("completedParts", []))
+        percent = int((completed_parts / total_parts) * 100) if total_parts > 0 else 0
+        progress['percent'] = percent
+
+        return jsonify({"progress": progress}), 200
+
+    
+    elif request.method == "POST":
+        data = request.get_json() or {}
+        
+        
+        
+        if "progress" in data:
+            progress = data.get("progress")
+        else:
+            
+            progress = data
+        
+        if not progress or not isinstance(progress, dict):
+            return jsonify({"error": "No valid progress data provided"}), 400
+        
+        now = datetime.utcnow()
+        result = progress_collection.update_one(
+            {"course_id": oid, "user_email": user['email']},
+            {"$set": {"progress": progress, "updated_at": now}},
+            upsert=True
+        )
+        return jsonify({"success": True, "updated_at": now.isoformat()}), 200
+    
+    elif request.method == "DELETE":
+        res = progress_collection.delete_one({
+            "course_id": oid, "user_email": user['email']
+        })
+        return jsonify({"deleted": res.deleted_count > 0}), 200
+    
 @app.route("/gquestions", methods=["POST"])
 def generateQuestion():
     data = request.get_json()

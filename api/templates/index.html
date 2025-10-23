@@ -17,7 +17,6 @@
     <style>
       * {
         user-select: none;
-        -webkit-user-select: none;
       }
       html,
       body {
@@ -25,6 +24,9 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
+        transition:
+          background 0.5s,
+          color 0.5s;
       }
 
       .coolfont {
@@ -50,7 +52,6 @@
           background-position: 100% 50%;
         }
       }
-
       body {
         font-family:
           -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
@@ -81,23 +82,11 @@
             transparent 35%
           ),
           linear-gradient(135deg, #000 0%, #190f0f 50%, #140c00 100%);
-        background-attachment: fixed;
-        color: white;
-        font-size: 15px;
-        position: fixed;
-        width: 100%;
-        height: 100%;
         background-size: 400% 400%;
-        animation: bgMove 40s ease-in-out infinite;
-      }
-      @keyframes bgMove {
-        0%,
-        100% {
-          background-position: 0% 0%;
-        }
-        50% {
-          background-position: 100% 100%;
-        }
+        animation: balls 60s ease-in-out infinite;
+        color: white;
+
+        font-size: 13px;
       }
 
       .carousel {
@@ -122,19 +111,29 @@
         scroll-snap-align: start;
         cursor: pointer;
         position: relative;
-        border-radius: 0.375rem;
+        border-radius: 0.75rem;
         overflow: hidden;
-        transition:
-          transform 0.3s ease,
-          border 0.3s ease;
+        transition: transform 0.3s ease;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
       }
 
-      .course-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 2px;
+      body {
+        --card-bg: rgba(0, 0, 0, 0.2);
+        --card-border: rgba(255, 255, 255, 0.05);
+        --text-muted: rgba(255, 255, 255, 0.6);
+      }
+
+      .progress-container {
+        height: 6px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+      }
+      .progress-bar {
+        height: 100%;
         background: linear-gradient(
           90deg,
           rgb(237, 153, 153),
@@ -142,62 +141,7 @@
           rgb(246, 241, 144),
           rgb(240, 177, 117)
         );
-        background-size: 300% 300%;
-        opacity: 0;
-        transition:
-          opacity 0.4s ease,
-          background-position 3s ease-in-out;
-        -webkit-mask:
-          linear-gradient(#fff 0 0) content-box,
-          linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-      }
-      .course-card:hover::before {
-        opacity: 1;
-        animation: borderFlow 3s ease-in-out infinite;
-      }
-      @keyframes borderFlow {
-        0%,
-        100% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-      }
-
-      .skeleton {
-        background: linear-gradient(
-          90deg,
-          rgba(255, 255, 255, 0.03) 0%,
-          rgba(255, 255, 255, 0.08) 50%,
-          rgba(255, 255, 255, 0.03) 100%
-        );
-        background-size: 200% 100%;
-        animation: skeleton-wave 1.8s ease-in-out infinite;
-        border-radius: 0.5rem;
-      }
-      @keyframes skeleton-wave {
-        0% {
-          background-position: 200% 0;
-        }
-        100% {
-          background-position: -200% 0;
-        }
-      }
-      .skeleton-text {
-        height: 1rem;
-        margin-bottom: 0.5rem;
-        background: linear-gradient(
-          90deg,
-          rgba(255, 255, 255, 0.05) 0%,
-          rgba(255, 255, 255, 0.12) 50%,
-          rgba(255, 255, 255, 0.05) 100%
-        );
-        background-size: 200% 100%;
-        animation: skeleton-wave 1.8s ease-in-out infinite;
-        border-radius: 0.25rem;
+        transition: width 0.4s ease;
       }
 
       .fade {
@@ -207,9 +151,20 @@
       .fade.show {
         opacity: 1;
       }
+      #userSection {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 800px;
+        padding: 1rem 1.5rem;
+        z-index: 50;
+      }
     </style>
   </head>
-  <body>
+
+  <body class="dark">
     <div
       id="main_content"
       class="flex items-center justify-center h-screen flex-col"
@@ -232,91 +187,60 @@
         </button>
       </div>
 
-
       <textarea
         placeholder="What do you wanna learn?"
         id="input"
         class="p-5 sticky bg-black/[0.1] resize-none text-base outline-none backdrop-blur-xl transition-shadow duration-200 ease-in-out shadow-sm focus:shadow-lg text-white/[0.8] placeholder-white/[0.4] border border-white/[0.05] rounded-full h-18 w-3/4 max-w-3xl"
       ></textarea>
 
-      <div id="coursesCarousel" class="w-3/4 max-w-3xl mt-10 hidden fade">
+      <div id="continueCarousel" class="w-3/4 max-w-3xl mt-10 hidden fade">
         <h3 class="text-white/[0.6] text-sm mb-4 uppercase tracking-wider">
-          Your Courses (<span id="courseCountLabel">0</span>)
+          Continue Learning
         </h3>
-        <div class="carousel" id="coursesList"></div>
+        <div class="carousel" id="continueList"></div>
       </div>
 
-      <div id="gcoursesCarousel" class="w-3/4 max-w-3xl mt-10 hidden fade">
-        <h3 class="text-white/[0.6] text-sm mb-4 uppercase tracking-wider">
-          Newest Courses
-        </h3>
-        <div class="carousel" id="gcoursesList"></div>
-      </div>
+      <div class="carousel" id="coursesList"></div>
+    </div>
 
+    <div id="userSection" class="flex flex-col items-start space-y-4">
       <div
-        id="userSection"
-        class="w-3/4 max-w-3xl mt-8 flex flex-col items-start space-y-4 hidden"
+        class="flex items-center justify-between bg-black/[0.1] backdrop-blur-xl border border-white/[0.05] rounded-full py-3 px-6 w-full"
       >
-        <div
-          class="flex items-center justify-between bg-black/[0.1] backdrop-blur-xl border border-white/[0.05] rounded-full py-3 px-6 w-full"
-        >
-          <div class="flex items-center">
-            <img id="userPicture" src="" class="w-10 h-10 rounded-full mr-3" />
-            <span id="userName" class="text-white/[0.8] text-base"></span>
-          </div>
-          <button
-            id="logoutBtn"
-            class="bg-red-500/[0.1] hover:bg-red-500/[0.5] border border-red-500/[0.1] text-white rounded-full py-1.5 px-4 text-sm transition duration-300"
-          >
-            <i class="fa fa-sign-out-alt mr-1"></i>
-          </button>
+        <div class="flex items-center">
+          <img id="userPicture" src="" class="w-10 h-10 rounded-full mr-3" />
+          <span id="userName" class="text-white/[0.8] text-base"></span>
         </div>
+        <button
+          id="logoutBtn"
+          class="bg-red-500/[0.1] hover:bg-red-500/[0.5] border border-red-500/[0.1] text-white rounded-full py-1.5 px-4 text-sm transition duration-300"
+        >
+          <i class="fa fa-sign-out-alt mr-1"></i>
+        </button>
       </div>
     </div>
 
     <script>
+      const continueList = document.getElementById("continueList");
+      const continueCarousel = document.getElementById("continueCarousel");
+
       let currentUser = null;
-      let userLoaded = false,
-        allLoaded = false;
-
-      const userSection = document.getElementById("userSection");
-      const coursesList = document.getElementById("coursesList");
-      const gcoursesList = document.getElementById("gcoursesList");
-      const coursesCarousel = document.getElementById("coursesCarousel");
-      const gcoursesCarousel = document.getElementById("gcoursesCarousel");
-
-      function showSkeleton(list, count = 3) {
-        list.innerHTML = Array(count)
-          .fill(0)
-          .map(
-            () => `
-          <div class="course-card bg-black/[0.2] backdrop-blur-md border border-white/[0.05] rounded-md p-5">
-            <div class="skeleton-text w-3/4"></div>
-            <div class="skeleton-text w-1/2"></div>
-          </div>`,
-          )
-          .join("");
-      }
 
       async function checkAuth() {
         try {
           const res = await fetch("/api/user");
           const data = await res.json();
+
           if (data.logged_in) {
             currentUser = data;
             document.getElementById("authSection").classList.add("hidden");
-            userSection.classList.remove("hidden");
+            document.getElementById("userSection").classList.remove("hidden");
             document.getElementById("userName").textContent = data.name;
             document.getElementById("userPicture").src = data.picture;
             document.getElementById("input").disabled = false;
-            showSkeleton(coursesList);
-            showSkeleton(gcoursesList);
-            await Promise.all([loadUserCourses(), loadAllCourses()]);
-            coursesCarousel.classList.add("show");
-            gcoursesCarousel.classList.add("show");
           } else {
             document.getElementById("authSection").classList.remove("hidden");
-            userSection.classList.add("hidden");
+            document.getElementById("userSection").classList.add("hidden");
             document.getElementById("input").disabled = true;
             document.getElementById("input").placeholder =
               "Sign in to start learning";
@@ -326,76 +250,88 @@
         }
       }
 
-      async function loadUserCourses() {
+      function deleteCourse(courseId) {
+        if (!confirm("Are you sure you want to delete this course?")) return;
+
+        fetch(`/api/course/${courseId}`, { method: "DELETE" })
+          .then((res) => res.json())
+          .then(() => {
+            const card = document.getElementById(`course-${courseId}`);
+            if (card) {
+              card.style.transition = "all 0.3s ease";
+              card.style.opacity = 0;
+              card.style.transform = "scale(0.9)";
+              setTimeout(() => card.remove(), 300);
+
+              const label = document.getElementById("courseCountLabel");
+              if (label) label.textContent = parseInt(label.textContent) - 1;
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+
+      async function loadContinueCourses() {
         try {
           const res = await fetch("/api/user/courses");
           const data = await res.json();
-          if (data.courses && data.courses.length > 0) {
-            coursesList.innerHTML = data.courses
-              .map(
-                (c) => `
-              <div class="course-card bg-black/[0.2] backdrop-blur-md border border-white/[0.05] rounded-md p-5 relative" id="course-${c.id}" onclick="window.innerWidth>768&&(window.location.href='/course?id=${c.id}')">
-                <h4 class="text-white text-base font-semibold mb-2 truncate">${c.title}</h4>
-                <p class="text-white/[0.5] text-sm">${new Date(c.created_at).toLocaleDateString()}</p>
-                <button class="absolute bottom-2 right-4 bg-red-500/[0.1] hover:bg-red-500/[0.5] border border-red-500/[0.1] text-white rounded-full py-1 px-3 text-sm transition duration-300" onclick="event.stopPropagation(); deleteCourse('${c.id}')"><i class="fa fa-trash"></i></button>
-              </div>`,
-              )
-              .join("");
-            document.getElementById("courseCountLabel").textContent =
-              data.courses.length;
-            coursesCarousel.classList.remove("hidden");
-          } else {
-            coursesList.innerHTML =
-              "<p class='text-white/[0.4]'>No courses yet.</p>";
+
+          if (!data.courses?.length) {
+            continueCarousel.classList.add("hidden");
+            return;
           }
+
+          const coursesWithProgress = await Promise.all(
+            data.courses.map(async (c) => {
+              const progress = await fetch(`/api/course/${c.id}/progress`)
+                .then((r) => r.json())
+                .then((p) => p.progress?.percent || 0)
+                .catch(() => 0);
+
+              return { ...c, progress };
+            }),
+          );
+
+          continueList.innerHTML = coursesWithProgress
+            .map((c) => {
+              const title =
+                c.title.length > 30 ? c.title.slice(0, 30) + "..." : c.title;
+              return `
+              <div class="course-card p-5 relative" id="course-${c.id}">
+                <button 
+                  onclick="event.stopPropagation(); deleteCourse('${c.id}')"
+                  class="absolute top-3 right-3 w-6 h-6 flex items-center justify-center text-white/[0.4] hover:text-red-500 hover:bg-red-500/[0.1] rounded-full transition-all duration-200 z-10"
+                  title="Delete course"
+                >
+                  <i class="fa fa-times text-sm"></i>
+                </button>
+                <div onclick="window.location.href='/course?id=${c.id}'" class="cursor-pointer">
+                  <h4 class="text-base font-semibold mb-2 pr-6">${title}</h4>
+                  <div class="flex justify-between items-center text-sm text-[var(--text-muted)] mb-1">
+                    <span>${c.progress}% complete</span>
+                    <span>${new Date(c.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div class="progress-container">
+                    <div class="progress-bar" style="width:${c.progress}%"></div>
+                  </div>
+                </div>
+              </div>`;
+            })
+            .join("");
+
+          continueCarousel.classList.remove("hidden");
+          continueCarousel.classList.add("show");
         } catch (err) {
-          console.error("Failed to load user courses:", err);
+          console.error("Failed to load continue courses", err);
         }
       }
 
-      async function loadAllCourses() {
-        try {
-          const res = await fetch("/api/all/courses");
-          const data = await res.json();
-          if (data.courses && data.courses.length > 0) {
-            gcoursesList.innerHTML = data.courses
-              .map(
-                (c) => `
-              <div class="course-card bg-black/[0.2] backdrop-blur-md border border-white/[0.05] rounded-md p-5" onclick="window.innerWidth>768&&(window.location.href='/course?id=${c.id}')">
-                <h4 class="text-white text-base font-semibold mb-2 truncate">${c.title}</h4>
-                <p class="text-white/[0.5] text-sm">${new Date(c.created_at).toLocaleDateString()} ${c.author}</p>
-              </div>`,
-              )
-              .join("");
-            gcoursesCarousel.classList.remove("hidden");
-          } else {
-            gcoursesList.innerHTML =
-              "<p class='text-white/[0.4]'>No new courses available.</p>";
-          }
-        } catch (err) {
-          console.error("Failed to load all courses:", err);
-        }
-      }
-
-      function deleteCourse(id) {
-        if (!confirm("Are you sure?")) return;
-        fetch(`/api/course/${id}`, { method: "DELETE" })
-          .then((res) => res.json())
-          .then(() => {
-            const el = document.getElementById(`course-${id}`);
-            if (el) {
-              el.style.opacity = 0;
-              setTimeout(() => el.remove(), 300);
-            }
-            const label = document.getElementById("courseCountLabel");
-            label.textContent = parseInt(label.textContent) - 1;
-          });
-      }
-
-      document.getElementById("loginBtn").onclick = () =>
-        (window.location.href = "/login");
-      document.getElementById("logoutBtn").onclick = () =>
-        (window.location.href = "/logout");
+      loadContinueCourses();
+      document
+        .getElementById("loginBtn")
+        .addEventListener("click", () => (window.location.href = "/login"));
+      document
+        .getElementById("logoutBtn")
+        .addEventListener("click", () => (window.location.href = "/logout"));
 
       const textarea = document.getElementById("input");
       textarea.addEventListener("keydown", (e) => {
@@ -409,8 +345,9 @@
       });
 
       if (window.innerWidth <= 768) {
-        textarea.disabled = true;
-        textarea.placeholder = "Unusable on mobile.";
+        const input = document.getElementById("input");
+        input.disabled = true;
+        input.placeholder = "Unusable on mobile.";
       }
 
       checkAuth();

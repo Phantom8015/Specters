@@ -1,6 +1,6 @@
 # [Specters](https://specters.dev)
 
-This project is my submission to Aether-Tech Hacks
+This project is my submission to Aether-Tech Hacks and NavHacks
 
 # What does Specters do?
 
@@ -30,7 +30,8 @@ After they press enter, a course gets generated.
 Specters is hosted on https://specters.dev
 
 But if you want it on your own machine, then:
-1. Run this in your terminal: `git clone https://github.com/Phantom8015/Specters` 
+
+1. Run this in your terminal: `git clone https://github.com/Phantom8015/Specters`
 2. Once cloned, make sure Python is installed (`python --version`)
 3. Then, configure your environment variables in a new file called `.env`. An example has been provided.
 4. Lastly, cd into the `api` folder and run `python index.py`

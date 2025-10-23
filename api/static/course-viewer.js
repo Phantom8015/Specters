@@ -1,4 +1,6 @@
 let currentUser = null;
+let progress = { part: 0, completedParts: [], quizScores: {} };
+let autosaveTimer = null;
 
 async function checkAuth() {
   try {
@@ -16,6 +18,49 @@ checkAuth();
 const urlParams = new URLSearchParams(window.location.search);
 const prompt = urlParams.get("prompt");
 const courseId = urlParams.get("id");
+
+function saveProgressDebounced() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveProgress, 800);
+}
+
+async function saveProgress() {
+  try {
+    progress.lastSaved = new Date().toISOString();
+    localStorage.setItem(`progress_${courseId}`, JSON.stringify(progress));
+    if (currentUser && courseId) {
+      await fetch(`/api/course/${courseId}/progress`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(progress),
+      });
+    }
+  } catch (err) {
+    console.warn("saveProgress failed", err);
+  }
+}
+
+async function loadProgress() {
+  let local = localStorage.getItem(`progress_${courseId}`);
+  if (local) {
+    try {
+      progress = JSON.parse(local);
+    } catch {}
+  }
+  if (currentUser && courseId) {
+    try {
+      const r = await fetch(`/api/course/${courseId}/progress`);
+      if (r.ok) {
+        const d = await r.json();
+        if (d.progress) progress = d.progress;
+      }
+    } catch {}
+  }
+
+  if (!progress.completedParts) progress.completedParts = [];
+  if (!progress.quizScores) progress.quizScores = {};
+  if (typeof progress.part !== "number") progress.part = 0;
+}
 
 async function fetchCourse(promptText) {
   const r = await fetch("/gc", {
@@ -186,6 +231,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   showCourseSkeleton();
 
+  await loadProgress();
+
   let course;
   try {
     course = courseId
@@ -197,10 +244,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<p style="color:#f87171">Failed to load course.</p>';
     return;
   }
+  if (course.t && course.t.length > 20) {
+    course.t = course.t.slice(0, 20) + "...";
+  }
   courseTitle.textContent = course.t || "Untitled Course";
-  let currentPart = 0;
+
+  let currentPart = progress.part || 0;
+
   partsContainer.innerHTML = "";
-  const questionsCache = {};
   let inQuiz = false;
   let quizPassed = false;
   let quizFailed = false;
@@ -209,6 +260,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (inQuiz) return;
     if (currentPart > 0) {
       currentPart--;
+      progress.part = currentPart;
+      saveProgressDebounced();
       renderPart();
     }
   });
@@ -218,14 +271,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btn = document.createElement("button");
     btn.textContent = part.n || `Part ${i + 1}`;
     btn.className = "parts-btn";
-    btn.style.pointerEvents = "none";
-    btn.style.cursor = "not-allowed";
+
+    const isCompleted = progress.completedParts.includes(i);
+    const isCurrent = i === currentPart;
+
+    if (isCompleted || isCurrent) {
+      btn.style.pointerEvents = "auto";
+      btn.style.cursor = "pointer";
+      if (isCompleted) {
+        btn.classList.add("completed");
+      }
+    } else {
+      btn.style.pointerEvents = "none";
+      btn.style.cursor = "not-allowed";
+    }
 
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      if (!btn.classList.contains("active")) {
+      if (isCompleted || isCurrent) {
+        currentPart = i;
+        progress.part = currentPart;
+        saveProgressDebounced();
+        quizPassed = false;
+        quizFailed = false;
+        renderPart();
+        closeSidebarOnMobile();
+      } else if (!btn.classList.contains("active")) {
         nextBtn.classList.remove("shake-next");
         void nextBtn.offsetWidth;
         nextBtn.classList.add("shake-next");
@@ -257,8 +330,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       nextBtn.style.color = "rgba(255,255,255,0.75)";
       nextBtn.onclick = () => {
         currentPart++;
+        progress.part = currentPart;
         quizPassed = false;
         quizFailed = false;
+        saveProgressDebounced();
         renderPart();
       };
     } else {
@@ -273,9 +348,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderPart() {
     const part = course.c[currentPart] || { d: "", s: [] };
     partTitle.textContent = part.n || `Part ${currentPart + 1}`;
+
     Array.from(partsContainer.children).forEach((b, i) => {
       b.classList.toggle("active", i === currentPart);
+
+      const isCompleted = progress.completedParts.includes(i);
+      const isCurrent = i === currentPart;
+
+      if (isCompleted || isCurrent) {
+        b.style.pointerEvents = "auto";
+        b.style.cursor = "pointer";
+        if (isCompleted && i !== currentPart) {
+          b.classList.add("completed");
+        } else {
+          b.classList.remove("completed");
+        }
+      } else {
+        b.style.pointerEvents = "none";
+        b.style.cursor = "not-allowed";
+        b.classList.remove("completed");
+      }
     });
+
     courseContent.style.opacity = "0";
     setTimeout(() => {
       const sectionsHtml = (part.s || [])
@@ -339,6 +433,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       backBtn.disabled = false;
       quizPassed = true;
       quizFailed = false;
+
+      if (!progress.completedParts.includes(currentPart)) {
+        progress.completedParts.push(currentPart);
+      }
+      saveProgressDebounced();
+
       updateNextButton();
       return;
     }
@@ -409,10 +509,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
           if (answeredCount === qs.length) {
             const percent = Math.round((score / qs.length) * 100);
+
+            progress.quizScores[currentPart] = percent;
+
             if (percent >= 50) {
               quizPassed = true;
               quizFailed = false;
               inQuiz = false;
+
+              if (!progress.completedParts.includes(currentPart)) {
+                progress.completedParts.push(currentPart);
+              }
+
+              saveProgressDebounced();
               nextBtn.disabled = false;
               backBtn.disabled = false;
               updateNextButton();
@@ -420,6 +529,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               quizPassed = false;
               quizFailed = true;
               inQuiz = false;
+              saveProgressDebounced();
               nextBtn.disabled = false;
               backBtn.disabled = false;
               updateNextButton();
