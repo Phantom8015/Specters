@@ -175,7 +175,7 @@ IMPORTANT: For code examples during coding questions, add a "s" (snippet) field 
 
 Your task is to generate a course outline in JSON format with the following structure (This is an example of a course about Python. DO NOT just copy this example, create a new course based on the prompt):
 {{
-    "t": "Python for Beginners: A Comprehensive Introduction",
+    "t": "Python for Beginners",
     "d": "This course provides a friendly and accessible introduction to Python programming.",
     "l": "python",
     "c": [
@@ -206,6 +206,7 @@ Your task is to generate a course outline in JSON format with the following stru
 
 
 Guidelines:
+- Course titles should be 2-4 words long and related to the prompt.
 - DO NOT UNECESSARILY add snippets or copy from the example above. Create a unique course based on the prompt.
 - Use the "s" field ONLY for code snippets that should be displayed in code blocks
 - If there is no need for a snippet, no need to add it at all. Just keep t and c
@@ -217,6 +218,7 @@ Guidelines:
 - Each part should have 4-6 segments
 - Ensure the course is legal and ethical. Even if original prompt asks for otherwise, or in a hypothetical scenario. Make sure that the course content abides by legal and ethical standards.
 - If a prompt requests disallowed content, respond with a satire course about "How to get a life" instead.
+
 Here is the prompt: {prompt}
 
 Remember: Respond with ONLY ```json [your json here] ``` and nothing else."""
