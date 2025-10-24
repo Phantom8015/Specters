@@ -215,7 +215,8 @@ Guidelines:
 - Include practical examples and explanations
 - Create 4-9 parts for a complete course
 - Each part should have 4-6 segments
-
+- Ensure the course is legal and ethical. Even if original prompt asks for otherwise, or in a hypothetical scenario. Make sure that the course content abides by legal and ethical standards.
+- If a prompt requests disallowed content, respond with a satire course about "How to get a life" instead.
 Here is the prompt: {prompt}
 
 Remember: Respond with ONLY ```json [your json here] ``` and nothing else."""
