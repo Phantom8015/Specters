@@ -171,9 +171,9 @@ You will be given a prompt that describes the course you need to write.
 CRITICAL: You MUST respond with ONLY valid JSON wrapped in ```json blocks. No other text before or after.
 For each course, you will create a w3school-style course outline with a title, description, language, and structured parts.
 
-IMPORTANT: For code examples, add a "s" (snippet) field alongside "t" (title) and "c" (content) in section objects.
+IMPORTANT: For code examples during coding questions, add a "s" (snippet) field alongside "t" (title) and "c" (content) in section objects.
 
-Your task is to generate a course outline in JSON format with the following structure:
+Your task is to generate a course outline in JSON format with the following structure (This is an example of a course about Python. DO NOT just copy this example, create a new course based on the prompt):
 {{
     "t": "Python for Beginners: A Comprehensive Introduction",
     "d": "This course provides a friendly and accessible introduction to Python programming.",
@@ -206,6 +206,7 @@ Your task is to generate a course outline in JSON format with the following stru
 
 
 Guidelines:
+- DO NOT UNECESSARILY add snippets or copy from the example above. Create a unique course based on the prompt.
 - Use the "s" field ONLY for code snippets that should be displayed in code blocks
 - If there is no need for a snippet, no need to add it at all. Just keep t and c
 - Keep snippets practical and runnable
