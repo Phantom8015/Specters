@@ -1,8 +1,8 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/Phantom8015/Bekter/refs/heads/main/website/favicon.png" width="150" height="150"/>
 </p>
-<h1 align="center">Bekter</h1>
-<p align="center">Bekter is a powerful web-based file explorer with terminal integration, system monitoring, and modern UI. Built with Node.js and designed for efficiency and ease of use.</p>
+<h1 align="center">Bekters</h1>
+<p align="center">Bekters is a powerful web-based file explorer with terminal integration, system monitoring, and modern UI. Built with Node.js and designed for efficiency and ease of use.</p>
 
 Note: This has not been tested outside of Ubuntu/Debian. Stability is not guaranteed if you are not using them.
 Another note: This was called Specters before. I don't want to buy another domain for another project. So say hi to Bekters.
