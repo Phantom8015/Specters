@@ -1,6 +1,6 @@
 # [Specters](https://specters.dev)
 
-This project is my submission to Aether-Tech Hacks and NavHacks
+This project is my submission to Various Hackathons
 
 # What does Specters do?
 
