@@ -174,15 +174,146 @@ select:focus {
   gap: 8px;
 }
 
+.toolbar {
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#user-menu-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.user-dropdown {
+  min-width: auto;
+}
+
+.user-dropdown-menu {
+  left: auto;
+  right: 0;
+  min-width: 190px;
+  width: auto;
+  z-index: 10000;
+}
+
+.custom-sort-dropdown.user-dropdown .custom-sort-menu {
+  background: rgba(14, 18, 26, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(22px) saturate(1.25) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.25) !important;
+}
+
+.user-menu-heading {
+  cursor: default;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  padding: 6px 12px;
+}
+
+.user-menu-heading:hover {
+  background: transparent;
+}
+
+.user-dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.user-dropdown-link i {
+  width: 14px;
+  color: var(--text-accent);
+}
+
+.user-menu-danger,
+.user-menu-danger i {
+  color: var(--error);
+}
+
+.menu-separator {
+  height: 1px;
+  background: var(--border-primary);
+  margin: 4px 0;
+}
+
+#up-btn.drag-target-active {
+  background: rgba(100, 160, 255, 0.2);
+  color: var(--text-primary);
+}
+
 .path-bar {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   gap: 8px;
+  min-width: 0;
+  max-width: 760px;
 }
 
 #path-input {
   flex: 1;
   font-size: 12px;
+}
+
+.toolbar .topbar-sort-controls {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  gap: 6px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.toolbar .topbar-sort-controls label {
+  font-size: 11px;
+}
+
+.toolbar .topbar-sort-controls .custom-sort-dropdown {
+  min-width: 110px;
+  flex-shrink: 1;
+}
+
+.toolbar .topbar-sort-controls .sort-order-btn {
+  height: 26px;
+}
+
+@media screen and (max-width: 1340px) and (min-width: 769px) {
+  .path-bar {
+    max-width: 560px;
+  }
+
+  .toolbar .topbar-sort-controls {
+    margin-left: 8px;
+    margin-right: 0;
+  }
+
+  .toolbar .topbar-sort-controls label {
+    display: none;
+  }
+
+  .toolbar .topbar-sort-controls .custom-sort-dropdown {
+    min-width: 92px;
+  }
+}
+
+@media screen and (max-width: 1120px) and (min-width: 769px) {
+  .path-bar {
+    max-width: 430px;
+  }
+
+  .toolbar .topbar-sort-controls .custom-sort-dropdown {
+    min-width: 84px;
+  }
+
+  .toolbar .topbar-sort-controls .custom-sort-button {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
 }
 
 .main-content {
@@ -216,37 +347,24 @@ select:focus {
 
 .file-list-header {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 120px 180px 140px;
   column-gap: 32px;
-  padding: 12px 28px;
+  align-items: center;
+  padding: 8px 28px 6px 28px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 6px 6px 0 0;
   font-weight: 600;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  align-items: center;
-}
-
-.file-column-headers {
-  display: grid;
-  grid-template-columns: 1fr 120px 180px 140px;
-  column-gap: 32px;
-  padding: 8px 28px 4px 28px;
-  background: transparent;
-  font-weight: 500;
-  font-size: 10px;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  align-items: center;
   border-bottom: 1px solid var(--border-secondary);
   margin-bottom: 4px;
 }
 
-.column-header-spacer {
-  display: block;
+.file-list-title {
+  font-size: 10px;
+  letter-spacing: 0.45px;
 }
 
 .column-header {
@@ -294,6 +412,15 @@ select:focus {
 .file-item.selected {
   background: var(--bg-selected);
   color: var(--text-primary);
+}
+
+.file-item.drag-source {
+  opacity: 0.55;
+}
+
+.file-item.drag-over-folder {
+  background: var(--bg-selected);
+  box-shadow: inset 0 0 0 1px rgba(100, 160, 255, 0.45);
 }
 
 .file-name {
@@ -967,6 +1094,7 @@ select:focus {
   z-index: 2000;
   min-width: 180px;
   overflow: hidden;
+  padding: 4px 0;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-primary);
@@ -999,7 +1127,7 @@ select:focus {
 .context-item.separator {
   height: 1px;
   background: var(--border-primary);
-  margin: 5px 0;
+  margin: 4px 0;
   padding: 0;
   cursor: default;
 }
