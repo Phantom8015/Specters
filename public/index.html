@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Specters</title>
+    <script>window.__SPECTERS_DEFAULT_PATH__ = __SPECTERS_DEFAULT_PATH__;</script>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="mobile-styles.css" />
     <link
@@ -106,6 +107,34 @@
                   type="text"
                   placeholder="e.g. ls -la"
                 />
+              </div>
+            </div>
+          </div>
+
+          <div id="user-menu-wrapper" style="display:flex;align-items:center;gap:4px;margin-left:4px">
+            <a
+              id="admin-panel-btn"
+              href="/admin"
+              class="toolbar-btn"
+              title="User Management"
+              style="display:none;text-decoration:none"
+            >
+              <i class="fas fa-users-cog"></i>
+            </a>
+            <div class="custom-sort-dropdown" id="user-dropdown-wrapper">
+              <button id="user-menu-btn" class="toolbar-btn" title="Account" style="display:flex;align-items:center;gap:5px">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-menu-name" style="font-size:12px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+              </button>
+              <div class="custom-sort-menu" id="user-dropdown-menu" style="right:0;left:auto;min-width:160px">
+                <div class="custom-sort-item" id="user-role-display" style="color:var(--text-tertiary);cursor:default;font-size:11px;padding:6px 12px"></div>
+                <div class="context-item separator"></div>
+                <div class="custom-sort-item" id="change-password-item" style="padding:6px 12px">
+                  <i class="fas fa-key" style="width:14px;margin-right:6px"></i>Change Password
+                </div>
+                <div class="custom-sort-item" id="logout-item" style="padding:6px 12px;color:var(--error)">
+                  <i class="fas fa-sign-out-alt" style="width:14px;margin-right:6px"></i>Sign Out
+                </div>
               </div>
             </div>
           </div>
@@ -370,5 +399,146 @@
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.min.js"></script>
 
     <script src="script.js"></script>
+
+    <div id="change-password-modal" class="modal hidden">
+      <div class="modal-content" style="max-width:380px">
+        <div class="modal-header">
+          <h3>Change Password</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">Current Password</label>
+            <input type="password" id="cp-current" class="path-input" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:7px 10px;color:var(--text-primary);font-size:13px;outline:none;user-select:text;-webkit-user-select:text" placeholder="Current password" />
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">New Password</label>
+            <input type="password" id="cp-new" class="path-input" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:7px 10px;color:var(--text-primary);font-size:13px;outline:none;user-select:text;-webkit-user-select:text" placeholder="Min 8 characters" />
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">Confirm New Password</label>
+            <input type="password" id="cp-confirm" class="path-input" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:7px 10px;color:var(--text-primary);font-size:13px;outline:none;user-select:text;-webkit-user-select:text" placeholder="Repeat new password" />
+          </div>
+          <div id="cp-error" style="display:none;padding:8px 10px;background:rgba(255,83,112,0.1);border:1px solid rgba(255,83,112,0.3);border-radius:4px;font-size:12px;color:#ff5370"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="cp-save-btn" class="btn btn-primary">Update Password</button>
+          <button class="btn btn-secondary modal-close">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    (function () {
+      const _fetch = window.fetch;
+      window.fetch = function (...args) {
+        return _fetch.apply(this, args).then((res) => {
+          if (res.status === 401 && !args[0].toString().includes("/api/auth/")) {
+            window.location.replace("/login");
+          }
+          return res;
+        });
+      };
+
+      fetch("/api/auth/me")
+        .then((r) => {
+          if (!r.ok) { window.location.replace("/login"); return null; }
+          return r.json();
+        })
+        .then((user) => {
+          if (!user) return;
+
+          window.__SPECTERS_USER__ = user;
+
+          document.getElementById("user-menu-name").textContent = user.username;
+          document.getElementById("user-role-display").textContent =
+            user.role === "admin" ? "Administrator" :
+            user.role === "readwrite" ? "Read / Write" : "Read-only";
+
+          if (user.role === "admin") {
+            document.getElementById("admin-panel-btn").style.display = "flex";
+          }
+        })
+        .catch(() => window.location.replace("/login"));
+
+      const wrapper = document.getElementById("user-dropdown-wrapper");
+      const btn = document.getElementById("user-menu-btn");
+      const menu = document.getElementById("user-dropdown-menu");
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const open = menu.style.display === "block";
+        menu.style.display = open ? "none" : "block";
+      });
+      document.addEventListener("click", () => { menu.style.display = "none"; });
+
+      document.getElementById("logout-item").addEventListener("click", async () => {
+        await fetch("/api/auth/logout", { method: "POST" });
+        window.location.replace("/login");
+      });
+
+      document.getElementById("change-password-item").addEventListener("click", () => {
+        menu.style.display = "none";
+        document.getElementById("cp-current").value = "";
+        document.getElementById("cp-new").value = "";
+        document.getElementById("cp-confirm").value = "";
+        document.getElementById("cp-error").style.display = "none";
+        document.getElementById("change-password-modal").classList.remove("hidden");
+      });
+
+      document.getElementById("cp-save-btn").addEventListener("click", async () => {
+        const current = document.getElementById("cp-current").value;
+        const newPass = document.getElementById("cp-new").value;
+        const confirm = document.getElementById("cp-confirm").value;
+        const errEl = document.getElementById("cp-error");
+
+        errEl.style.display = "none";
+
+        if (!current || !newPass || !confirm) {
+          errEl.textContent = "All fields are required.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (newPass.length < 8) {
+          errEl.textContent = "New password must be at least 8 characters.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (newPass !== confirm) {
+          errEl.textContent = "New passwords do not match.";
+          errEl.style.display = "block";
+          return;
+        }
+
+        const btn = document.getElementById("cp-save-btn");
+        btn.disabled = true;
+        btn.textContent = "Updating…";
+
+        try {
+          const res = await fetch("/api/auth/me/password", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ currentPassword: current, newPassword: newPass }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            document.getElementById("change-password-modal").classList.add("hidden");
+            if (window.showNotification) {
+              window.showNotification("Password updated successfully.", "success");
+            }
+          } else {
+            errEl.textContent = data.error || "Failed to update password.";
+            errEl.style.display = "block";
+          }
+        } catch {
+          errEl.textContent = "Connection error.";
+          errEl.style.display = "block";
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Update Password";
+        }
+      });
+    })();
+    </script>
   </body>
 </html>

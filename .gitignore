@@ -3,3 +3,9 @@ node_modules
 a.sh
 .DS_Store
 .vercel
+
+data/users.json
+data/.secret
+data/sessions/
+
+.env

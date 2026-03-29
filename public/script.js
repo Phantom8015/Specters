@@ -10,7 +10,14 @@ let terminal,
 let terminalFontSize = 11;
 let isResizing = false;
 
+function hasTerminalAccess() {
+  const u = window.__SPECTERS_USER__;
+  if (!u) return true;
+  return u.role === "admin" || (u.permissions || []).includes("execute");
+}
+
 function openTerminal() {
+  if (!hasTerminalAccess()) return;
   try {
     if (
       window.settingsManager &&
@@ -239,10 +246,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 class FileExplorer {
   constructor() {
-    this.currentPath = "/home/";
+    this.currentPath = window.__SPECTERS_DEFAULT_PATH__ || "/";
     this.selectedFiles = new Set();
     this.clipboard = { items: [], operation: null };
-    this.history = ["/home/"];
+    this.history = [window.__SPECTERS_DEFAULT_PATH__ || "/"];
     this.historyIndex = 0;
     this.cache = new Map();
     this.cacheTimeout = 10000;
@@ -681,6 +688,11 @@ class FileExplorer {
       return;
     }
 
+    if (!hasTerminalAccess()) {
+      this.loadFiles(path);
+      return;
+    }
+
     try {
       if (
         window.settingsManager &&
@@ -694,30 +706,19 @@ class FileExplorer {
     } catch (_) {}
 
     if (!terminalVisible) {
-      console.log("Opening terminal...");
       openTerminal();
     }
 
     const sendCommand = () => {
-      console.log("Attempting to send command...");
       if (termSocket && termSocket.readyState === WebSocket.OPEN && terminal) {
         const cdCommand = `cd "${path}"\r`;
-        console.log("Sending command:", cdCommand);
         termSocket.send(cdCommand);
         terminal.focus();
         this.showNotification(`Changing directory to: ${path}`, "info");
       } else if (termSocket && termSocket.readyState === WebSocket.CONNECTING) {
-        console.log("Terminal still connecting, waiting...");
         setTimeout(sendCommand, 200);
       } else {
-        console.error(
-          "Terminal not ready. Socket state:",
-          termSocket ? termSocket.readyState : "null",
-        );
-        this.showNotification(
-          "Terminal connection not ready, please try again",
-          "warning",
-        );
+        this.loadFiles(path);
       }
     };
 
@@ -1787,7 +1788,7 @@ class SettingsManager {
       terminalFontSize: 11,
       sortBy: "name",
       sortOrder: "asc",
-      startupPath: "/home/",
+      startupPath: window.__SPECTERS_DEFAULT_PATH__ || "/",
       startupCommand: "",
     };
 
