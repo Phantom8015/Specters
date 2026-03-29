@@ -2476,96 +2476,38 @@ class SettingsManager {
   }
 
   initializeSortControls() {
-    const sortDropdown = document.getElementById("custom-sort-dropdown");
-    const sortButton = document.getElementById("custom-sort-button");
-    const sortMenu = document.getElementById("custom-sort-menu");
-    const sortOrderBtn = document.getElementById("sort-order-btn");
-
-    if (sortDropdown && sortButton && sortMenu) {
-      this.updateSortButton();
-
-      sortButton.addEventListener("click", (e) => {
-        e.stopPropagation();
-        sortDropdown.classList.toggle("open");
-      });
-
-      const sortItems = sortMenu.querySelectorAll(".custom-sort-item");
-      sortItems.forEach((item) => {
-        item.addEventListener("click", (e) => {
-          e.stopPropagation();
-
-          sortItems.forEach((i) => i.classList.remove("selected"));
-
-          item.classList.add("selected");
-
-          this.settings.sortBy = item.dataset.value;
-
-          this.saveSettings({ applyLayout: false });
-          this.updateSortButton();
-          this.applySorting();
-
-          sortDropdown.classList.remove("open");
-        });
-      });
-
-      document.addEventListener("click", () => {
-        sortDropdown.classList.remove("open");
-      });
-    }
-
-    if (sortOrderBtn) {
-      sortOrderBtn.addEventListener("click", () => {
-        this.settings.sortOrder =
-          this.settings.sortOrder === "asc" ? "desc" : "asc";
-
-        this.saveSettings({ applyLayout: false });
-        this.updateSortOrderButton();
-        this.applySorting();
-      });
-      this.updateSortOrderButton();
-    }
+    this.updateSortHeaders();
+    document.addEventListener("click", (e) => {
+      const header = e.target.closest(".column-header.sortable");
+      if (!header) return;
+      const sortKey = header.dataset.sort;
+      if (this.settings.sortBy === sortKey) {
+        this.settings.sortOrder = this.settings.sortOrder === "asc" ? "desc" : "asc";
+      } else {
+        this.settings.sortBy = sortKey;
+        this.settings.sortOrder = "asc";
+      }
+      this.saveSettings({ applyLayout: false });
+      this.updateSortHeaders();
+      this.applySorting();
+    });
   }
 
   applySorting() {
     this.applyExplorerSettings();
   }
 
-  updateSortOrderButton() {
-    const sortOrderBtn = document.getElementById("sort-order-btn");
-    if (!sortOrderBtn) return;
-
-    const icon = sortOrderBtn.querySelector("i");
-    if (icon) {
-      icon.className =
-        this.settings.sortOrder === "asc"
-          ? "fas fa-sort-alpha-down"
-          : "fas fa-sort-alpha-up";
-    }
-    sortOrderBtn.title = `Sort ${this.settings.sortOrder === "asc" ? "Ascending" : "Descending"}`;
-  }
-
-  updateSortButton() {
-    const sortButtonText = document.getElementById("sort-button-text");
-    if (!sortButtonText) return;
-
-    const sortLabels = {
-      name: "Name",
-      date: "Date Modified",
-      size: "Size",
-      type: "File Type",
-    };
-
-    sortButtonText.textContent = sortLabels[this.settings.sortBy] || "Name";
-
-    const sortItems = document.querySelectorAll(".custom-sort-item");
-    sortItems.forEach((item) => {
-      if (item.dataset.value === this.settings.sortBy) {
-        item.classList.add("selected");
-      } else {
-        item.classList.remove("selected");
-      }
+  updateSortHeaders() {
+    document.querySelectorAll(".column-header.sortable").forEach((header) => {
+      const isActive = header.dataset.sort === this.settings.sortBy;
+      header.classList.toggle("sort-active", isActive);
+      header.classList.toggle("sort-desc", isActive && this.settings.sortOrder === "desc");
     });
   }
+
+  updateSortOrderButton() {}
+
+  updateSortButton() {}
 
   initializeTerminalSettings() {
     const terminalSettingsBtn = document.getElementById(

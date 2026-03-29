@@ -172,13 +172,9 @@ select:focus {
 .toolbar {
   display: flex;
   gap: 8px;
+  flex: 0 0 auto;
 }
 
-.toolbar {
-  align-items: center;
-  flex: 1 1 auto;
-  min-width: 0;
-}
 
 #user-menu-wrapper {
   display: flex;
@@ -198,7 +194,7 @@ select:focus {
 }
 
 .custom-sort-dropdown.user-dropdown .custom-sort-menu {
-  background: rgba(14, 18, 26, 0.18) !important;
+  background: rgba(14, 18, 26, 0.92) !important;
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(22px) saturate(1.25) !important;
@@ -248,16 +244,20 @@ select:focus {
 .path-bar {
   flex: 1 1 auto;
   display: flex;
-  gap: 8px;
+  gap: 0;          /* remove gap so CD hugs the input */
   min-width: 0;
-  max-width: 760px;
 }
 
 #path-input {
   flex: 1;
   font-size: 12px;
+  border-radius: 4px 0 0 4px;   /* left corners only */
 }
 
+#cd-btn {
+  border-radius: 0 4px 4px 0;   /* right corners only */
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
 .toolbar .topbar-sort-controls {
   margin-left: auto;
   margin-right: auto;
@@ -283,10 +283,6 @@ select:focus {
 }
 
 @media screen and (max-width: 1340px) and (min-width: 769px) {
-  .path-bar {
-    max-width: 560px;
-  }
-
   .toolbar .topbar-sort-controls {
     margin-left: 8px;
     margin-right: 0;
@@ -302,10 +298,6 @@ select:focus {
 }
 
 @media screen and (max-width: 1120px) and (min-width: 769px) {
-  .path-bar {
-    max-width: 430px;
-  }
-
   .toolbar .topbar-sort-controls .custom-sort-dropdown {
     min-width: 84px;
   }
@@ -376,6 +368,38 @@ select:focus {
   text-align: left;
 }
 
+.column-header.sortable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s;
+}
+
+.column-header.sortable:hover {
+  color: var(--text-secondary);
+}
+
+.column-header.sortable.sort-active {
+  color: var(--text-primary);
+}
+
+.sort-indicator {
+  display: inline-block;
+  width: 10px;
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+.column-header.sort-active .sort-indicator::after {
+  content: '↓';
+}
+
+.column-header.sort-active.sort-desc .sort-indicator::after {
+  content: '↑';
+}
+
 .header-column {
   color: var(--text-secondary);
   font-weight: 600;
@@ -426,7 +450,7 @@ select:focus {
 .file-name {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -805,7 +829,7 @@ select:focus {
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .btn-primary {

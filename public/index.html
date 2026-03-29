@@ -147,34 +147,6 @@
             </div>
           </div>
 
-          <div class="sort-controls topbar-sort-controls">
-            <label>Sort by:</label>
-            <div class="custom-sort-dropdown" id="custom-sort-dropdown">
-              <button class="custom-sort-button" id="custom-sort-button">
-                <span id="sort-button-text">Name</span>
-                <i class="fas fa-chevron-down"></i>
-              </button>
-              <div class="custom-sort-menu" id="custom-sort-menu">
-                <div class="custom-sort-item selected" data-value="name">
-                  Name
-                </div>
-                <div class="custom-sort-item" data-value="size">Size</div>
-                <div class="custom-sort-item" data-value="date">
-                  Date Modified
-                </div>
-                <div class="custom-sort-item" data-value="type">
-                  File Type
-                </div>
-              </div>
-            </div>
-            <button
-              id="sort-order-btn"
-              class="sort-order-btn"
-              title="Toggle sort order"
-            >
-              <i class="fas fa-sort-alpha-down"></i>
-            </button>
-          </div>
         </div>
       </header>
 
@@ -182,9 +154,9 @@
         <div class="file-explorer">
           <div class="file-list-container">
             <div class="file-list-header">
-              <div class="file-list-title">Files</div>
-              <div class="column-header">Size</div>
-              <div class="column-header">Date Modified</div>
+              <div class="file-list-title column-header sortable" data-sort="name">Files<span class="sort-indicator"></span></div>
+              <div class="column-header sortable" data-sort="size">Size<span class="sort-indicator"></span></div>
+              <div class="column-header sortable" data-sort="date">Date Modified<span class="sort-indicator"></span></div>
               <div class="column-header">Permissions</div>
             </div>
 
