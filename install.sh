@@ -1,173 +1,132 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' 
+NC='\033[0m'
 
-
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+print_status()  { echo -e "${GREEN}[INFO]${NC} $1"; }
+print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
+print_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
+print_header()  {
+  echo -e "${BLUE}========================================${NC}"
+  echo -e "${BLUE}$1${NC}"
+  echo -e "${BLUE}========================================${NC}"
 }
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
+command_exists() { command -v "$1" >/dev/null 2>&1; }
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-print_header() {
-    echo -e "${BLUE}========================================${NC}"
-    echo -e "${BLUE}$1${NC}"
-    echo -e "${BLUE}========================================${NC}"
-}
-
-
-if [[ "$OSTYPE" != "linux-gnu"* ]]; then
-    print_error "This script is designed for Linux only."
-    print_error "Current OS: $OSTYPE"
-    print_error "Please run this script on a Linux system."
+OS=$(uname -s)
+case "$OS" in
+  Darwin) PLATFORM="macos" ;;
+  Linux)  PLATFORM="linux" ;;
+  *)
+    print_error "Unsupported OS: $OS"
     exit 1
+    ;;
+esac
+
+print_header "Specters — Install Script ($OS)"
+
+if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+  print_warning "Running as root is not recommended for Node.js apps."
+  read -r -p "Continue anyway? (y/N): " confirm
+  [[ "$confirm" =~ ^[Yy]$ ]] || exit 1
 fi
 
-print_header "Specters - Setup Script"
-
-
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
+install_homebrew() {
+  if command_exists brew; then
+    print_status "Homebrew already installed: $(brew --version | head -1)"
+    return
+  fi
+  print_status "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
 }
-
 
 install_nodejs() {
-    if command_exists node; then
-        NODE_VERSION=$(node --version)
-        print_status "Node.js is already installed: $NODE_VERSION"
-        
-        
-        MAJOR_VERSION=$(echo $NODE_VERSION | sed 's/v//' | cut -d. -f1)
-        if [ "$MAJOR_VERSION" -lt 16 ]; then
-            print_warning "Node.js version is less than 16. Please update to Node.js 16 or higher."
-        fi
-    else
-        print_status "Installing Node.js..."
-        
-        
+  if command_exists node; then
+    NODE_VERSION=$(node --version)
+    MAJOR=$(echo "$NODE_VERSION" | sed 's/v//' | cut -d. -f1)
+    print_status "Node.js already installed: $NODE_VERSION"
+    if [[ "$MAJOR" -lt 16 ]]; then
+      print_warning "Node.js $NODE_VERSION is too old (need ≥16). Upgrading..."
+      if [[ "$PLATFORM" == "macos" ]]; then
+        brew upgrade node || brew install node
+      else
         curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
         sudo apt-get install -y nodejs
-        
-        if command_exists node; then
-            print_status "Node.js installed successfully: $(node --version)"
-        else
-            print_error "Failed to install Node.js"
-            exit 1
-        fi
+      fi
     fi
+    return
+  fi
+
+  print_status "Installing Node.js..."
+  if [[ "$PLATFORM" == "macos" ]]; then
+    brew install node
+  else
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+  fi
+
+  command_exists node && print_status "Node.js installed: $(node --version)" \
+    || { print_error "Node.js installation failed"; exit 1; }
 }
 
-
-install_git() {
-    if command_exists git; then
-        print_status "Git is already installed: $(git --version)"
-    else
-        print_status "Installing Git..."
-        
-        sudo apt-get update
-        sudo apt-get install -y git
-        
-        if command_exists git; then
-            print_status "Git installed successfully"
-        else
-            print_error "Failed to install Git"
-            exit 1
-        fi
-    fi
+install_system_deps_linux() {
+  print_status "Installing build dependencies..."
+  sudo apt-get update -qq
+  sudo apt-get install -y build-essential python3 python3-pip git
 }
 
-
-install_system_deps() {
-    print_status "Installing system dependencies..."
-    
-    sudo apt-get update
-    sudo apt-get install -y build-essential python3 python3-pip
+install_xcode_cli() {
+  if xcode-select -p &>/dev/null; then
+    print_status "Xcode Command Line Tools already installed"
+    return
+  fi
+  print_status "Installing Xcode Command Line Tools..."
+  xcode-select --install
+  print_warning "A dialog may have appeared. Please complete the installation, then re-run this script."
+  exit 0
 }
-
 
 setup_repository() {
-    REPO_URL="https://github.com/Phantom8015/Specters.git"
-    PROJECT_DIR="Specters"
-    
-    if [ -d "$PROJECT_DIR" ]; then
-        print_status "Project directory exists. Updating..."
-        cd "$PROJECT_DIR"
-        git pull origin main
-    else
-        print_status "Cloning repository..."
-        git clone "$REPO_URL"
-        cd "$PROJECT_DIR"
-    fi
-}
+  REPO_URL="https://github.com/Phantom8015/Specters.git"
+  PROJECT_DIR="Specters"
 
+  if [[ -d "$PROJECT_DIR" ]]; then
+    print_status "Repository exists — pulling latest changes..."
+    git -C "$PROJECT_DIR" pull origin main
+  else
+    print_status "Cloning repository..."
+    git clone "$REPO_URL"
+  fi
+
+  cd "$PROJECT_DIR"
+}
 
 install_node_deps() {
-    print_status "Installing Node.js dependencies..."
-    
-    
-    if ! command_exists npm; then
-        print_error "npm not found. Please ensure Node.js is properly installed."
-        exit 1
-    fi
-    
-    
-    npm install
-    
-    if [ $? -eq 0 ]; then
-        print_status "Dependencies installed successfully"
-    else
-        print_error "Failed to install dependencies"
-        exit 1
-    fi
+  print_status "Installing Node.js dependencies..."
+  npm install && print_status "Dependencies installed" \
+    || { print_error "npm install failed"; exit 1; }
 }
 
+setup_systemd() {
+  print_status "Setting up systemd service..."
 
-setup_dev_env() {
-    print_status "Setting up development environment..."
-    
-    
-    if ! command_exists nodemon; then
-        print_status "Installing nodemon globally..."
-        npm install -g nodemon
-    fi
-    
-    
-    chmod +x install.sh
-    if [ -f "a.sh" ]; then
-        chmod +x a.sh
-    fi
-}
+  SERVICE_NAME="specters"
+  SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
+  CURRENT_USER=$(whoami)
+  CURRENT_DIR=$(pwd)
+  NODE_PATH=$(which node)
 
-
-setup_systemd_service() {
-    print_status "Setting up systemd service for auto-startup..."
-    
-    SERVICE_NAME="specters"
-    SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-    CURRENT_USER=$(whoami)
-    CURRENT_DIR=$(pwd)
-    NODE_PATH=$(which node)
-    
-    if [ -z "$NODE_PATH" ]; then
-        print_error "Node.js not found in PATH"
-        return 1
-    fi
-    
-    print_status "Creating systemd service file..."
-    
-    sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+  sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
-Description=Specters
+Description=Specters File Manager
 After=network.target
 StartLimitIntervalSec=0
 
@@ -184,83 +143,112 @@ Environment=PORT=3000
 [Install]
 WantedBy=multi-user.target
 EOF
-    
-    if [ $? -eq 0 ]; then
-        print_status "Service file created successfully"
-        
-        print_status "Enabling and starting the service..."
-        sudo systemctl daemon-reload
-        sudo systemctl enable "$SERVICE_NAME"
-        sudo systemctl start "$SERVICE_NAME"
-        
-        if sudo systemctl is-active --quiet "$SERVICE_NAME"; then
-            print_status "Service started successfully and enabled for auto-startup"
-            print_status "Service status:"
-            sudo systemctl status "$SERVICE_NAME" --no-pager -l
-        else
-            print_error "Failed to start the service"
-            print_status "Service logs:"
-            sudo journalctl -u "$SERVICE_NAME" --no-pager -l
-            return 1
-        fi
-    else
-        print_error "Failed to create service file"
-        return 1
-    fi
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable "$SERVICE_NAME"
+  sudo systemctl restart "$SERVICE_NAME"
+
+  if sudo systemctl is-active --quiet "$SERVICE_NAME"; then
+    print_status "Systemd service started and enabled"
+  else
+    print_error "Service failed to start — check: sudo journalctl -u specters -f"
+    exit 1
+  fi
 }
 
+setup_launchd() {
+  print_status "Setting up launchd service..."
+
+  PLIST_LABEL="com.specters.app"
+  PLIST_PATH="$HOME/Library/LaunchAgents/${PLIST_LABEL}.plist"
+  CURRENT_DIR=$(pwd)
+  NODE_PATH=$(which node)
+  LOG_DIR="$HOME/Library/Logs/Specters"
+
+  mkdir -p "$LOG_DIR"
+
+  cat > "$PLIST_PATH" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${PLIST_LABEL}</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>${NODE_PATH}</string>
+    <string>${CURRENT_DIR}/server.js</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>${CURRENT_DIR}</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>NODE_ENV</key>
+    <string>production</string>
+    <key>PORT</key>
+    <string>3000</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>${LOG_DIR}/output.log</string>
+  <key>StandardErrorPath</key>
+  <string>${LOG_DIR}/error.log</string>
+</dict>
+</plist>
+EOF
+
+  launchctl unload "$PLIST_PATH" 2>/dev/null || true
+  launchctl load -w "$PLIST_PATH"
+
+  print_status "launchd service loaded — Specters will start automatically on login"
+  print_status "Logs: $LOG_DIR"
+}
 
 main() {
-    print_header "Starting Installation Process"
-    
-    
-    install_git
-    install_nodejs
-    install_system_deps
-    
-    
-    setup_repository
-    install_node_deps
-    setup_dev_env
-    
-    print_header "Installation Complete!"
-    print_status "All components have been installed successfully!"
-    print_status ""
-    print_status "Manual startup commands:"
-    echo -e "  ${BLUE}cd Specters${NC}"
-    echo -e "  ${BLUE}npm start${NC}"
+  print_header "Starting Installation"
+
+  if [[ "$PLATFORM" == "macos" ]]; then
+    install_homebrew
+    install_xcode_cli
+  else
+    install_system_deps_linux
+  fi
+
+  install_nodejs
+  setup_repository
+  install_node_deps
+
+  print_header "Installation Complete"
+  print_status "Manual start:  npm start"
+  print_status "Dev mode:      npm run dev"
+  print_status "App URL:       http://localhost:3000"
+  echo ""
+
+  if [[ "$PLATFORM" == "macos" ]]; then
+    setup_launchd
+    print_header "Setup Complete"
     echo ""
-    print_status "For development mode with auto-reload:"
-    echo -e "  ${BLUE}npm run dev${NC}"
+    print_status "Service management (macOS):"
+    echo -e "  ${BLUE}launchctl stop  com.specters.app${NC}   — stop"
+    echo -e "  ${BLUE}launchctl start com.specters.app${NC}   — start"
+    echo -e "  ${BLUE}launchctl unload ~/Library/LaunchAgents/com.specters.app.plist${NC}  — disable autostart"
+    echo -e "  ${BLUE}tail -f ~/Library/Logs/Specters/output.log${NC}  — live logs"
+  else
+    setup_systemd
+    print_header "Setup Complete"
     echo ""
-    print_status "The server will be available at: http://localhost:3000"
-    echo ""
-    
-    
-    setup_systemd_service
-    
-    print_header "Setup Fully Complete!"
-    print_status ""
-    print_status "Service management commands:"
-    echo -e "  ${BLUE}sudo systemctl status specters${NC}   - Check service status"
-    echo -e "  ${BLUE}sudo systemctl stop specters${NC}    - Stop the service"
-    echo -e "  ${BLUE}sudo systemctl start specters${NC}   - Start the service"
-    echo -e "  ${BLUE}sudo systemctl restart specters${NC} - Restart the service"
-    echo -e "  ${BLUE}sudo journalctl -u specters -f${NC}  - View live logs"
-    echo ""
-    print_warning "The service is now running and will automatically start on system boot."
+    print_status "Service management (Linux):"
+    echo -e "  ${BLUE}sudo systemctl status  specters${NC}"
+    echo -e "  ${BLUE}sudo systemctl stop    specters${NC}"
+    echo -e "  ${BLUE}sudo systemctl start   specters${NC}"
+    echo -e "  ${BLUE}sudo systemctl restart specters${NC}"
+    echo -e "  ${BLUE}sudo journalctl -u specters -f${NC}  — live logs"
+  fi
+  echo ""
 }
-
-
-if [ "$EUID" -eq 0 ]; then
-    print_warning "This script is running as root. This is not recommended for Node.js applications."
-    print_warning "Please run this script as a regular user."
-    read -p "Do you want to continue anyway? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
-fi
-
 
 main

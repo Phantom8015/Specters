@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specters — Login</title>
+    <link rel="stylesheet" href="/auth.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="auth-page">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">
+            <i class="fas fa-ghost"></i>
+          </div>
+          <div class="auth-logo-name">Specters</div>
+          <div class="auth-logo-sub">File Manager &amp; Terminal</div>
+        </div>
+
+        <div class="auth-title">Sign in</div>
+        <div class="auth-description">
+          Enter your credentials to access the file manager.
+        </div>
+
+        <form class="auth-form" id="login-form" autocomplete="off" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              class="form-input"
+              placeholder="Enter username"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-wrapper">
+              <input
+                type="password"
+                id="password"
+                class="form-input"
+                placeholder="Enter password"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                class="input-toggle"
+                id="toggle-password"
+                tabindex="-1"
+                title="Toggle password visibility"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-error" id="login-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="login-error-text"></span>
+          </div>
+
+          <button type="submit" class="auth-btn" id="login-btn">
+            Sign in
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("login-form");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const loginBtn = document.getElementById("login-btn");
+      const errorBox = document.getElementById("login-error");
+      const errorText = document.getElementById("login-error-text");
+      const toggleBtn = document.getElementById("toggle-password");
+
+      fetch("/api/auth/me")
+        .then((r) => {
+          if (r.ok) window.location.replace("/");
+        })
+        .catch(() => {});
+
+      toggleBtn.addEventListener("click", () => {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        toggleBtn.querySelector("i").className = isPassword
+          ? "fas fa-eye-slash"
+          : "fas fa-eye";
+      });
+
+      function showError(msg) {
+        errorText.textContent = msg;
+        errorBox.classList.add("visible");
+        passwordInput.classList.add("error");
+      }
+
+      function clearError() {
+        errorBox.classList.remove("visible");
+        passwordInput.classList.remove("error");
+        usernameInput.classList.remove("error");
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!username || !password) {
+          showError("Please enter your username and password.");
+          return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Signing in…";
+
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            window.location.replace("/");
+          } else if (res.status === 429) {
+            showError(
+              data.error || "Too many attempts. Please wait 15 minutes."
+            );
+          } else {
+            showError(data.error || "Login failed. Please try again.");
+            passwordInput.value = "";
+            passwordInput.focus();
+          }
+        } catch {
+          showError("Connection error. Please try again.");
+        } finally {
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Sign in";
+        }
+      });
+
+      [usernameInput, passwordInput].forEach((el) =>
+        el.addEventListener("input", clearError)
+      );
+
+      window.addEventListener("load", () => usernameInput.focus());
+    </script>
+  </body>
+</html>

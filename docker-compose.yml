@@ -9,10 +9,10 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      
-      
-      - /home:/app/managed/home:rw
-      - /var/log:/app/managed/logs:ro
+      - ${HOST_HOME}:/app/managed/home:rw
+      - ${HOST_LOGS:-/var/log}:/app/managed/logs:ro
+      # Persist user accounts, session secret, and active sessions across restarts
+      - specters_data:/app/data
       
       
     environment:
@@ -30,11 +30,14 @@ services:
           cpus: '1'
     
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/ping', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+volumes:
+  specters_data:
 
 
   

@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specters — Initial Setup</title>
+    <link rel="stylesheet" href="/auth.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="auth-page" style="max-width: 460px">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">
+            <i class="fas fa-ghost"></i>
+          </div>
+          <div class="auth-logo-name">Specters</div>
+          <div class="auth-logo-sub">First-time setup</div>
+        </div>
+
+        <div class="setup-steps">
+          <div class="step active" id="step1-indicator">
+            <span class="step-num">1</span>
+            <span>Create account</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step" id="step2-indicator">
+            <span class="step-num">2</span>
+            <span>Done</span>
+          </div>
+        </div>
+
+        <div id="step1">
+          <div class="auth-title">Create root account</div>
+          <div class="auth-description">
+            This account will have full administrator access. You can add more
+            users with restricted permissions after setup.
+          </div>
+
+          <form class="auth-form" id="setup-form" autocomplete="off" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                class="form-input"
+                placeholder="e.g. admin"
+                autocomplete="off"
+                autocapitalize="none"
+                spellcheck="false"
+                maxlength="32"
+                required
+              />
+              <ul class="requirements" id="username-reqs">
+                <li id="req-length">
+                  <i class="fas fa-circle"></i> 2–32 characters
+                </li>
+                <li id="req-chars">
+                  <i class="fas fa-circle"></i> Letters, numbers, _ and - only
+                </li>
+              </ul>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <div class="input-wrapper">
+                <input
+                  type="password"
+                  id="password"
+                  class="form-input"
+                  placeholder="Choose a strong password"
+                  autocomplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="input-toggle"
+                  id="toggle-password"
+                  tabindex="-1"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div class="password-strength" id="strength-area" style="display:none">
+                <div class="strength-bar">
+                  <div class="strength-segment" id="seg1"></div>
+                  <div class="strength-segment" id="seg2"></div>
+                  <div class="strength-segment" id="seg3"></div>
+                  <div class="strength-segment" id="seg4"></div>
+                </div>
+                <div class="strength-label" id="strength-label"></div>
+              </div>
+              <ul class="requirements" id="password-reqs">
+                <li id="req-minlen">
+                  <i class="fas fa-circle"></i> At least 8 characters
+                </li>
+                <li id="req-upper">
+                  <i class="fas fa-circle"></i> Uppercase letter
+                </li>
+                <li id="req-lower">
+                  <i class="fas fa-circle"></i> Lowercase letter
+                </li>
+                <li id="req-num">
+                  <i class="fas fa-circle"></i> Number or symbol
+                </li>
+              </ul>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirm">Confirm Password</label>
+              <div class="input-wrapper">
+                <input
+                  type="password"
+                  id="confirm"
+                  class="form-input"
+                  placeholder="Repeat password"
+                  autocomplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="input-toggle"
+                  id="toggle-confirm"
+                  tabindex="-1"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="auth-error" id="setup-error">
+              <i class="fas fa-exclamation-circle"></i>
+              <span id="setup-error-text"></span>
+            </div>
+
+            <button type="submit" class="auth-btn" id="setup-btn" disabled>
+              Create Root Account
+            </button>
+          </form>
+        </div>
+
+        <div id="step2" style="display:none; text-align:center; padding: 16px 0">
+          <div style="font-size: 44px; margin-bottom: 14px">
+            <i class="fas fa-check-circle" style="color: var(--success)"></i>
+          </div>
+          <div class="auth-title" style="margin-bottom: 8px">
+            Setup complete!
+          </div>
+          <div class="auth-description" style="margin-bottom: 24px">
+            Your root account has been created. You're now logged in and will be
+            redirected to the file manager.
+          </div>
+          <div class="auth-description" style="font-size:12px; color: var(--text-muted)">
+            Redirecting<span id="dots"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      fetch("/api/auth/me")
+        .then((r) => {
+          if (r.ok) window.location.replace("/");
+        })
+        .catch(() => {});
+
+
+      const form = document.getElementById("setup-form");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const confirmInput = document.getElementById("confirm");
+      const setupBtn = document.getElementById("setup-btn");
+      const errorBox = document.getElementById("setup-error");
+      const errorText = document.getElementById("setup-error-text");
+
+      function setupToggle(btnId, inputEl) {
+        document.getElementById(btnId).addEventListener("click", () => {
+          const isPass = inputEl.type === "password";
+          inputEl.type = isPass ? "text" : "password";
+          document
+            .getElementById(btnId)
+            .querySelector("i").className = isPass
+            ? "fas fa-eye-slash"
+            : "fas fa-eye";
+        });
+      }
+      setupToggle("toggle-password", passwordInput);
+      setupToggle("toggle-confirm", confirmInput);
+
+      function showError(msg) {
+        errorText.textContent = msg;
+        errorBox.classList.add("visible");
+      }
+      function clearError() {
+        errorBox.classList.remove("visible");
+      }
+
+      function validateUsername(val) {
+        const len = val.trim().length;
+        const chars = /^[a-zA-Z0-9_-]+$/.test(val.trim());
+        setReq("req-length", len >= 2 && len <= 32);
+        setReq("req-chars", val.trim() === "" || chars);
+        return len >= 2 && len <= 32 && chars;
+      }
+
+      function validatePassword(val) {
+        const minLen = val.length >= 8;
+        const upper = /[A-Z]/.test(val);
+        const lower = /[a-z]/.test(val);
+        const numSym = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(val);
+        setReq("req-minlen", minLen);
+        setReq("req-upper", upper);
+        setReq("req-lower", lower);
+        setReq("req-num", numSym);
+
+        const score = [minLen, upper, lower, numSym].filter(Boolean).length;
+        updateStrength(score, val);
+        return minLen;
+      }
+
+      function setReq(id, met) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle("met", met);
+        el.querySelector("i").className = met
+          ? "fas fa-check-circle"
+          : "fas fa-circle";
+      }
+
+      function updateStrength(score, val) {
+        const area = document.getElementById("strength-area");
+        const label = document.getElementById("strength-label");
+        if (!val) {
+          area.style.display = "none";
+          return;
+        }
+        area.style.display = "block";
+
+        const levels = ["weak", "fair", "good", "strong"];
+        const colors = ["active-weak", "active-fair", "active-good", "active-strong"];
+        const labels = ["Weak", "Fair", "Good", "Strong"];
+
+        for (let i = 1; i <= 4; i++) {
+          const seg = document.getElementById(`seg${i}`);
+          seg.className = "strength-segment";
+          if (i <= score) seg.classList.add(colors[score - 1]);
+        }
+        label.textContent = labels[score - 1] || "";
+        label.style.color = score <= 1 ? "var(--error)" :
+                            score === 2 ? "var(--warning)" :
+                            score === 3 ? "var(--success)" : "var(--accent)";
+      }
+
+      function checkReady() {
+        const uValid = validateUsername(usernameInput.value);
+        const pValid = validatePassword(passwordInput.value);
+        const match = passwordInput.value && confirmInput.value === passwordInput.value;
+        setupBtn.disabled = !(uValid && pValid && match);
+      }
+
+      usernameInput.addEventListener("input", () => { clearError(); checkReady(); });
+      passwordInput.addEventListener("input", () => { clearError(); checkReady(); });
+      confirmInput.addEventListener("input", () => { clearError(); checkReady(); });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+
+        if (password !== confirm) {
+          showError("Passwords do not match.");
+          return;
+        }
+
+        setupBtn.disabled = true;
+        setupBtn.textContent = "Creating account…";
+
+        try {
+          const res = await fetch("/api/auth/setup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+            document.getElementById("step1-indicator").classList.remove("active");
+            document.getElementById("step1-indicator").classList.add("done");
+            document.getElementById("step2-indicator").classList.add("active");
+
+            let d = 0;
+            setInterval(() => {
+              d = (d + 1) % 4;
+              document.getElementById("dots").textContent = ".".repeat(d);
+            }, 400);
+            setTimeout(() => window.location.replace("/"), 2000);
+          } else if (res.status === 403) {
+            window.location.replace("/login");
+          } else {
+            showError(data.error || "Setup failed. Please try again.");
+            setupBtn.disabled = false;
+            setupBtn.textContent = "Create Root Account";
+          }
+        } catch {
+          showError("Connection error. Please try again.");
+          setupBtn.disabled = false;
+          setupBtn.textContent = "Create Root Account";
+        }
+      });
+
+      window.addEventListener("load", () => usernameInput.focus());
+    </script>
+  </body>
+</html>

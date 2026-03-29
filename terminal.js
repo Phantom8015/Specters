@@ -1,6 +1,8 @@
 const { Server } = require("ws");
 const pty = require("node-pty");
 const url = require("url");
+const { EventEmitter } = require("events");
+const { sessionMiddleware, loadUsers } = require("./auth");
 
 function terminal(server) {
   const wss = new Server({ noServer: true });
@@ -45,9 +47,7 @@ function terminal(server) {
         },
       });
 
-      console.log(
-        `Terminal process started with PID: ${connectionData.process.pid}`,
-      );
+      console.log(`Terminal process started with PID: ${connectionData.process.pid}`);
       connectionData.isReady = true;
 
       connectionData.process.onData((data) => {
@@ -55,9 +55,7 @@ function terminal(server) {
       });
 
       connectionData.process.onExit(({ exitCode, signal }) => {
-        console.log(
-          `Terminal exited with code: ${exitCode}, signal: ${signal}`,
-        );
+        console.log(`Terminal exited with code: ${exitCode}, signal: ${signal}`);
         broadcast(
           connectionData,
           `\r\n\u001b[31m[Terminal exited with code ${exitCode}]\u001b[0m\r\n`,
@@ -67,9 +65,6 @@ function terminal(server) {
       });
 
       if (connectionData.bufferedData.length > 0) {
-        console.log(
-          `Processing ${connectionData.bufferedData.length} buffered messages`,
-        );
         connectionData.bufferedData.forEach((msg) =>
           connectionData.process.write(msg),
         );
@@ -93,12 +88,62 @@ function terminal(server) {
     });
   }
 
-  server.on("upgrade", (req, socket, head) => {
-    if (req.url.startsWith("/terminal")) {
-      wss.handleUpgrade(req, socket, head, (ws) => {
-        wss.emit("connection", ws, req);
+  /**
+   * Validate a WebSocket upgrade request by running the session middleware
+   * against it.  Returns the user object if valid, null otherwise.
+   */
+  function validateUpgradeSession(req) {
+    return new Promise((resolve) => {
+      const fakeRes = Object.assign(new EventEmitter(), {
+        getHeader: () => undefined,
+        setHeader: () => {},
+        removeHeader: () => {},
+        end: function () {
+          this.emit("finish");
+        },
+        writableEnded: false,
+        headersSent: false,
+        locals: {},
       });
+
+      sessionMiddleware(req, fakeRes, () => {
+        const userId = req.session && req.session.userId;
+        if (!userId) return resolve(null);
+
+        const users = loadUsers();
+        const user = users.find((u) => u.id === userId);
+        if (!user) return resolve(null);
+
+        if (
+          user.role !== "admin" &&
+          !(user.permissions || []).includes("execute")
+        ) {
+          return resolve(null);
+        }
+
+        resolve(user);
+      });
+    });
+  }
+
+  server.on("upgrade", async (req, socket, head) => {
+    if (!req.url.startsWith("/terminal")) return;
+
+    const user = await validateUpgradeSession(req);
+    if (!user) {
+      console.warn(
+        `Rejected unauthenticated terminal connection from ${req.socket.remoteAddress}`,
+      );
+      socket.write(
+        "HTTP/1.1 401 Unauthorized\r\nContent-Type: text/plain\r\n\r\nUnauthorized",
+      );
+      socket.destroy();
+      return;
     }
+
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit("connection", ws, req);
+    });
   });
 
   wss.on("connection", (ws, req) => {
@@ -120,7 +165,6 @@ function terminal(server) {
       if (connectionData.process && connectionData.isReady) {
         connectionData.process.write(msg);
       } else {
-        console.log(`Buffering message for terminal ${terminalId} (not ready)`);
         connectionData.bufferedData.push(msg);
       }
     });
