@@ -17,9 +17,14 @@
   .toolbar {
     gap: 4px;
     flex-wrap: wrap;
+    flex: 0 0 auto;
   }
 
-  .toolbar .toolbar-btn:not(#delete-btn):not(#shutdown-btn) {
+  .toolbar .toolbar-btn:not(#delete-btn):not(#shutdown-btn):not(#user-menu-btn) {
+    display: none;
+  }
+
+  .topbar-sort-controls {
     display: none;
   }
 
@@ -38,15 +43,15 @@
     font-size: 12px;
   }
 
-  .file-column-headers {
+  .file-list-header {
     display: grid;
     grid-template-columns: 1fr 80px;
     column-gap: 16px;
     padding: 6px 16px 4px 16px;
   }
 
-  .file-column-headers .column-header:nth-child(3),
-  .file-column-headers .column-header:nth-child(4) {
+  .file-list-header .column-header:nth-child(3),
+  .file-list-header .column-header:nth-child(4) {
     display: none;
   }
 
@@ -174,7 +179,7 @@
     gap: 6px;
   }
 
-  .toolbar .toolbar-btn:not(#shutdown-btn) {
+  .toolbar .toolbar-btn:not(#shutdown-btn):not(#user-menu-btn) {
     display: none;
   }
 
@@ -192,7 +197,7 @@
     font-size: 13px;
   }
 
-  .file-column-headers {
+  .file-list-header {
     padding: 4px 12px;
   }
 

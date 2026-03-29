@@ -249,6 +249,7 @@ class FileExplorer {
     this.currentPath = window.__SPECTERS_DEFAULT_PATH__ || "/";
     this.selectedFiles = new Set();
     this.clipboard = { items: [], operation: null };
+    this.draggedItems = [];
     this.history = [window.__SPECTERS_DEFAULT_PATH__ || "/"];
     this.historyIndex = 0;
     this.cache = new Map();
@@ -327,15 +328,24 @@ class FileExplorer {
   initializeDragAndDrop() {
     const dropZone = document.getElementById("drop-zone");
     const fileList = document.getElementById("file-list");
-
-    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-      fileList.addEventListener(eventName, this.preventDefaults, false);
-    });
+    const upBtn = document.getElementById("up-btn");
 
     ["dragenter", "dragover"].forEach((eventName) => {
       fileList.addEventListener(
         eventName,
-        () => dropZone.classList.add("active"),
+        (e) => {
+          if (this.isExternalFileDrag(e)) {
+            this.preventDefaults(e);
+            dropZone.classList.add("active");
+            return;
+          }
+
+          const internalPaths = this.getInternalDragPaths(e);
+          if (internalPaths.length > 0) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+          }
+        },
         false,
       );
     });
@@ -343,12 +353,47 @@ class FileExplorer {
     ["dragleave", "drop"].forEach((eventName) => {
       fileList.addEventListener(
         eventName,
-        () => dropZone.classList.remove("active"),
+        (e) => {
+          if (this.isExternalFileDrag(e)) {
+            this.preventDefaults(e);
+            dropZone.classList.remove("active");
+          }
+        },
         false,
       );
     });
 
     fileList.addEventListener("drop", this.handleDrop.bind(this), false);
+
+    if (upBtn) {
+      upBtn.addEventListener("dragover", (e) => {
+        const internalPaths = this.getInternalDragPaths(e);
+        if (internalPaths.length === 0) return;
+
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        upBtn.classList.add("drag-target-active");
+      });
+
+      upBtn.addEventListener("dragleave", (e) => {
+        if (e.relatedTarget && upBtn.contains(e.relatedTarget)) return;
+        upBtn.classList.remove("drag-target-active");
+      });
+
+      upBtn.addEventListener("drop", async (e) => {
+        const internalPaths = this.getInternalDragPaths(e);
+        if (internalPaths.length === 0) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        upBtn.classList.remove("drag-target-active");
+
+        await this.moveItemsToDestination(
+          internalPaths,
+          this.getParentPath(this.currentPath),
+        );
+      });
+    }
   }
 
   initializeContextMenu() {
@@ -470,6 +515,151 @@ class FileExplorer {
     e.stopPropagation();
   }
 
+  isExternalFileDrag(e) {
+    const types = Array.from(e.dataTransfer?.types || []);
+    return types.includes("Files");
+  }
+
+  getInternalDragPaths(e) {
+    const transfer = e?.dataTransfer;
+    if (!transfer) {
+      return Array.from(this.draggedItems || []);
+    }
+
+    const rawPaths = transfer.getData("application/x-specters-paths");
+    if (rawPaths) {
+      try {
+        const parsed = JSON.parse(rawPaths);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (_) {}
+    }
+
+    return Array.from(this.draggedItems || []);
+  }
+
+  getParentPath(targetPath) {
+    return targetPath.split("/").slice(0, -1).join("/") || "/";
+  }
+
+  joinPath(basePath, entryName) {
+    const cleanBase = (basePath || "/").replace(/\/+$/, "") || "/";
+    const cleanEntry = (entryName || "").replace(/^\/+/, "");
+    return cleanBase === "/" ? `/${cleanEntry}` : `${cleanBase}/${cleanEntry}`;
+  }
+
+  bindFileItemInteractions(item, file) {
+    item.addEventListener("click", (e) => {
+      if (e.ctrlKey || e.metaKey) this.toggleFileSelection(item);
+      else if (e.shiftKey && this.selectedFiles.size > 0)
+        this.selectFileRange(item);
+      else {
+        this.clearSelection();
+        this.selectFile(item);
+      }
+    });
+
+    item.addEventListener("dblclick", () => {
+      if (file.isDirectory) this.loadFiles(file.path);
+      else this.openFile(file.path);
+    });
+
+    item.setAttribute("draggable", "true");
+
+    item.addEventListener("dragstart", (e) => {
+      if (!item.classList.contains("selected")) {
+        this.clearSelection();
+        this.selectFile(item);
+      }
+
+      const dragPaths = Array.from(this.selectedFiles);
+      this.draggedItems = dragPaths;
+
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData(
+        "application/x-specters-paths",
+        JSON.stringify(dragPaths),
+      );
+      e.dataTransfer.setData("text/plain", dragPaths.join("\n"));
+
+      document
+        .querySelectorAll(".file-item.selected")
+        .forEach((selectedItem) => selectedItem.classList.add("drag-source"));
+    });
+
+    item.addEventListener("dragover", (e) => {
+      if (item.dataset.isDirectory !== "true") return;
+
+      const internalPaths = this.getInternalDragPaths(e);
+      if (internalPaths.length === 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      e.dataTransfer.dropEffect = "move";
+      item.classList.add("drag-over-folder");
+    });
+
+    item.addEventListener("dragleave", (e) => {
+      if (item.dataset.isDirectory !== "true") return;
+      if (e.relatedTarget && item.contains(e.relatedTarget)) return;
+      item.classList.remove("drag-over-folder");
+    });
+
+    item.addEventListener("drop", async (e) => {
+      if (item.dataset.isDirectory !== "true") return;
+
+      const internalPaths = this.getInternalDragPaths(e);
+      if (internalPaths.length === 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      item.classList.remove("drag-over-folder");
+
+      await this.moveItemsToDestination(internalPaths, item.dataset.path);
+    });
+
+    item.addEventListener("dragend", () => {
+      this.draggedItems = [];
+      document
+        .querySelectorAll(".file-item.drag-source, .file-item.drag-over-folder")
+        .forEach((fileItem) =>
+          fileItem.classList.remove("drag-source", "drag-over-folder"),
+        );
+      document.getElementById("up-btn")?.classList.remove("drag-target-active");
+    });
+  }
+
+  async moveItemsToDestination(paths, destinationDir) {
+    const uniquePaths = [...new Set(paths)];
+    const moveCandidates = uniquePaths.filter((sourcePath) => {
+      if (!sourcePath || sourcePath === destinationDir) return false;
+      if (this.getParentPath(sourcePath) === destinationDir) return false;
+      if (destinationDir.startsWith(`${sourcePath}/`)) return false;
+      return true;
+    });
+
+    if (moveCandidates.length === 0) return;
+
+    this.showLoading(true);
+    try {
+      for (const sourcePath of moveCandidates) {
+        const destinationPath = this.joinPath(
+          destinationDir,
+          sourcePath.split("/").pop(),
+        );
+        await this.moveFile(sourcePath, destinationPath);
+      }
+
+      this.showNotification(`Moved ${moveCandidates.length} item(s)`, "success");
+      this.refresh();
+    } catch (error) {
+      this.showNotification(error.message, "error");
+    } finally {
+      this.showLoading(false);
+    }
+  }
+
   async loadFiles(path, skipCache = false) {
     if (!skipCache && this.cache.has(path)) {
       const cached = this.cache.get(path);
@@ -554,20 +744,7 @@ class FileExplorer {
             <div class="file-permissions">${permissions}</div>
         `;
 
-    item.addEventListener("click", (e) => {
-      if (e.ctrlKey || e.metaKey) this.toggleFileSelection(item);
-      else if (e.shiftKey && this.selectedFiles.size > 0)
-        this.selectFileRange(item);
-      else {
-        this.clearSelection();
-        this.selectFile(item);
-      }
-    });
-
-    item.addEventListener("dblclick", () => {
-      if (file.isDirectory) this.loadFiles(file.path);
-      else this.openFile(file.path);
-    });
+    this.bindFileItemInteractions(item, file);
 
     return item;
   }
@@ -744,6 +921,32 @@ class FileExplorer {
     }
   }
 
+  async createFile() {
+    const name = prompt("Enter file name:");
+    if (!name) return;
+
+    const fileName = name.trim();
+    if (!fileName) return;
+
+    const filePath = this.joinPath(this.currentPath, fileName);
+
+    try {
+      const response = await fetch("/api/save-file", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: filePath, content: "" }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      this.showNotification("File created successfully", "success");
+      this.refresh();
+    } catch (error) {
+      this.showNotification(error.message, "error");
+    }
+  }
+
   uploadFiles() {
     document.getElementById("file-input").click();
   }
@@ -756,7 +959,15 @@ class FileExplorer {
   }
 
   async handleDrop(e) {
-    const files = Array.from(e.dataTransfer.files);
+    this.preventDefaults(e);
+
+    const internalPaths = this.getInternalDragPaths(e);
+    if (internalPaths.length > 0) {
+      await this.moveItemsToDestination(internalPaths, this.currentPath);
+      return;
+    }
+
+    const files = Array.from(e.dataTransfer.files || []);
     if (files.length === 0) return;
     await this.uploadFilesToServer(files);
   }
@@ -947,7 +1158,10 @@ class FileExplorer {
     this.showLoading(true);
     try {
       for (const sourcePath of this.clipboard.items) {
-        const destinationPath = `${this.currentPath}/${sourcePath.split("/").pop()}`;
+        const destinationPath = this.joinPath(
+          this.currentPath,
+          sourcePath.split("/").pop(),
+        );
         if (this.clipboard.operation === "copy")
           await this.copyFile(sourcePath, destinationPath);
         else if (this.clipboard.operation === "cut")
@@ -1065,9 +1279,22 @@ class FileExplorer {
 
   handleContextAction(action) {
     const selectedPath = Array.from(this.selectedFiles)[0];
+    const actionWithoutSelection = ["paste", "new-folder", "new-file"];
+
+    if (!selectedPath && !actionWithoutSelection.includes(action)) {
+      this.showNotification("Select an item first", "warning");
+      return;
+    }
+
     switch (action) {
       case "preview":
         this.previewFile(selectedPath);
+        break;
+      case "new-folder":
+        this.createFolder();
+        break;
+      case "new-file":
+        this.createFile();
         break;
       case "copy":
         this.copySelected();
@@ -2106,20 +2333,7 @@ class SettingsManager {
             <div class="file-permissions">${permissions}</div>
         `;
 
-    item.addEventListener("click", (e) => {
-      if (e.ctrlKey || e.metaKey) window.fileExplorer.toggleFileSelection(item);
-      else if (e.shiftKey && window.fileExplorer.selectedFiles.size > 0)
-        window.fileExplorer.selectFileRange(item);
-      else {
-        window.fileExplorer.clearSelection();
-        window.fileExplorer.selectFile(item);
-      }
-    });
-
-    item.addEventListener("dblclick", () => {
-      if (file.isDirectory) window.fileExplorer.loadFiles(file.path);
-      else window.fileExplorer.openFile(file.path);
-    });
+    window.fileExplorer.bindFileItemInteractions(item, file);
 
     return item;
   }
