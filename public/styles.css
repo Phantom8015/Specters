@@ -244,18 +244,18 @@ select:focus {
 .path-bar {
   flex: 1 1 auto;
   display: flex;
-  gap: 0;          /* remove gap so CD hugs the input */
+  gap: 0;
   min-width: 0;
 }
 
 #path-input {
   flex: 1;
   font-size: 12px;
-  border-radius: 4px 0 0 4px;   /* left corners only */
+  border-radius: 4px 0 0 4px;
 }
 
 #cd-btn {
-  border-radius: 0 4px 4px 0;   /* right corners only */
+  border-radius: 0 4px 4px 0;
   border-left: 1px solid rgba(255,255,255,0.06);
 }
 .toolbar .topbar-sort-controls {
@@ -931,15 +931,7 @@ select:focus {
 }
 
 .terminal-resize-handle {
-  height: 8px;
-  cursor: ns-resize;
-  background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px 8px 0 0;
-}
-
-.terminal-resize-handle:hover {
-  background: rgba(64, 160, 255, 0.3);
+  display: none !important;
 }
 
 .terminal-header {
@@ -948,11 +940,20 @@ select:focus {
   align-items: center;
   padding: 8px 16px;
   background: rgba(24, 26, 32, calc(var(--glass-opacity) / 100));
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
   border-radius: 8px 8px 0 0;
   flex-shrink: 0;
+}
+
+.terminal-header.resize-top {
+  cursor: ns-resize;
+}
+
+.terminal-header.resize-left {
+  cursor: ew-resize;
 }
 
 #terminal-title {
@@ -1017,22 +1018,24 @@ select:focus {
   align-items: center;
 }
 
-.font-size-controls {
+.font-size-control {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  padding: 2px;
+  gap: 0;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
 }
 
-.font-size-btn {
-  background: none;
+.font-size-control .terminal-control-btn.font-btn {
+  background: var(--bg-secondary);
   border: none;
   color: var(--text-secondary);
-  width: 24px;
-  height: 24px;
-  border-radius: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1040,24 +1043,34 @@ select:focus {
   font-size: 14px;
   font-weight: bold;
   transition: all 0.2s ease;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.font-size-btn:hover {
+.font-size-control .terminal-control-btn.font-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
 }
 
-.font-size-btn:active {
+.font-size-control .terminal-control-btn.font-btn:active {
   transform: scale(0.95);
 }
 
-.font-size-display {
-  color: var(--text-tertiary);
+#font-size-display {
+  color: rgba(233, 238, 246, 0.95);
   font-size: 10px;
-  min-width: 24px;
+  font-weight: 600;
+  min-width: 42px;
+  height: 32px;
   text-align: center;
-  padding-left: 5px;
-  padding-right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 8px;
+  padding-right: 8px;
+  background: var(--bg-secondary);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 #terminal-close {
@@ -1082,6 +1095,12 @@ select:focus {
   overflow: hidden;
   font-family: "JetBrains Mono", "Fira Code", "SF Mono", monospace;
   border-radius: 0 0 8px 8px;
+}
+
+.xterm-glassy .xterm {
+  box-sizing: border-box;
+  padding-left: 8px;
+  padding-top: 6px;
 }
 
 #terminal-content {
@@ -1593,21 +1612,8 @@ select:focus {
   position: relative;
 }
 
-[data-layout="split"] .terminal-resize-handle {
-  width: 4px;
-  height: 100%;
+[data-layout="split"] .terminal-header.resize-left {
   cursor: ew-resize;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 10;
-}
-
-[data-layout="split"] .terminal-resize-handle:hover {
-  background: rgba(64, 160, 255, 0.3);
 }
 
 [data-layout="floating"] .terminal-container-wrapper {
@@ -1646,10 +1652,6 @@ select:focus {
   width: auto !important;
   height: auto !important;
   border-radius: 8px !important;
-}
-
-[data-layout="terminal-only"] .terminal-resize-handle {
-  display: none;
 }
 
 [data-file-style="compact"] .file-item {

@@ -165,13 +165,22 @@ function closeTerminal() {
 }
 
 function initializeTerminalResize() {
-  const resizeHandle = document.getElementById("terminal-resize-handle");
+  const terminalHeader = document.getElementById("terminal-header");
+  const legacyResizeHandle = document.getElementById("terminal-resize-handle");
+  const resizeHandle = terminalHeader || legacyResizeHandle;
   const terminalWrapper = document.getElementById("terminal-container-wrapper");
-  const mainContent = document.querySelector(".main-content");
   let isResizing = false;
   let startX, startY, initialWidth, initialHeight;
 
+  if (!resizeHandle || !terminalWrapper) return;
+
+  const isHorizontalResize = () => resizeHandle.classList.contains("resize-left");
+
   resizeHandle.addEventListener("mousedown", (e) => {
+    if (e.target.closest("button, input, select, textarea, a")) {
+      return;
+    }
+
     isResizing = true;
     startX = e.clientX;
     startY = e.clientY;
@@ -184,7 +193,7 @@ function initializeTerminalResize() {
     document.addEventListener("mouseup", stopResize);
     e.preventDefault();
 
-    if (resizeHandle.classList.contains("resize-left")) {
+    if (isHorizontalResize()) {
       document.body.style.cursor = "ew-resize";
     } else {
       document.body.style.cursor = "ns-resize";
@@ -197,7 +206,7 @@ function initializeTerminalResize() {
   function handleResize(e) {
     if (!isResizing) return;
 
-    if (resizeHandle.classList.contains("resize-left")) {
+    if (isHorizontalResize()) {
       const deltaX = startX - e.clientX;
       const newWidth = Math.max(
         200,
@@ -2085,7 +2094,9 @@ class SettingsManager {
 
     document.body.setAttribute("data-layout", layoutMode);
 
-    const resizeHandle = document.getElementById("terminal-resize-handle");
+    const terminalHeader = document.getElementById("terminal-header");
+    const legacyResizeHandle = document.getElementById("terminal-resize-handle");
+    const resizeHandle = terminalHeader || legacyResizeHandle;
     const terminalWrapper = document.getElementById(
       "terminal-container-wrapper",
     );
@@ -2094,12 +2105,15 @@ class SettingsManager {
     const fileExplorer = document.querySelector(".file-explorer");
 
     if (resizeHandle && terminalWrapper) {
-      resizeHandle.classList.remove(
-        "resize-top",
-        "resize-bottom",
-        "resize-left",
-        "resize-right",
-      );
+      [terminalHeader, legacyResizeHandle].forEach((handle) => {
+        if (!handle) return;
+        handle.classList.remove(
+          "resize-top",
+          "resize-bottom",
+          "resize-left",
+          "resize-right",
+        );
+      });
 
       terminalWrapper.style.position = "";
       terminalWrapper.style.width = "";
