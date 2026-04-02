@@ -62,7 +62,7 @@ function openTerminal() {
       cursorInactiveStyle: "outline",
       cursorWidth: 1,
       theme: {
-        background: "#12141b",
+        background: "rgba(0, 0, 0, 0)",
         foreground: "#d4d4d4",
         cursor: "#d4d4d4",
         cursorAccent: "#12141b",
@@ -180,6 +180,10 @@ function initializeTerminalResize() {
     if (e.target.closest("button, input, select, textarea, a")) {
       return;
     }
+
+    // Don't resize from header when terminal is floating — that's drag-to-move
+    const layout = document.body.dataset.layout || document.documentElement.dataset.layout;
+    if (layout === "floating") return;
 
     isResizing = true;
     startX = e.clientX;
@@ -1469,6 +1473,16 @@ class FileExplorer {
     content.innerHTML = "";
     modal.classList.remove("hidden");
 
+    // Reset edit button state
+    if (editBtn) {
+      editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+      editBtn.title = "Edit File";
+      editBtn.disabled = false;
+      editBtn.style.display = "";
+    }
+    const cancelBtn = document.getElementById("preview-cancel-btn");
+    if (cancelBtn) cancelBtn.remove();
+
     try {
       if (isImage) {
         const img = document.createElement("img");
@@ -1936,72 +1950,137 @@ async function fetchSystemStats() {
 }
 
 function updateSystemStatsDisplay(stats) {
+  // CPU
   const cpuLoad = document.getElementById("cpu-load");
   if (cpuLoad && stats.cpu && typeof stats.cpu.load === "number") {
     const load = Math.max(0, Math.min(100, Math.round(stats.cpu.load)));
     cpuLoad.textContent = load;
+    const cpuStat = document.getElementById("cpu-stat");
+    if (cpuStat) {
+      cpuStat.style.setProperty("--stat-fill", load + "%");
+      let title = `CPU: ${stats.cpu.cores} cores`;
+      if (stats.cpu.speed) title += ` @ ${stats.cpu.speed}GHz`;
+      cpuStat.title = title;
+    }
   }
 
+  // Memory
   const memoryUsage = document.getElementById("memory-usage");
-  if (
-    memoryUsage &&
-    stats.memory &&
-    typeof stats.memory.percentage === "number"
-  ) {
-    const percentage = Math.max(
-      0,
-      Math.min(100, Math.round(stats.memory.percentage)),
-    );
+  if (memoryUsage && stats.memory && typeof stats.memory.percentage === "number") {
+    const percentage = Math.max(0, Math.min(100, Math.round(stats.memory.percentage)));
     memoryUsage.textContent = percentage;
-
     const memoryStat = document.getElementById("memory-stat");
-    if (memoryStat && stats.memory.used && stats.memory.total) {
+    if (memoryStat) {
+      memoryStat.style.setProperty("--stat-fill", percentage + "%");
       let tooltip = `Memory: ${stats.memory.used}GB / ${stats.memory.total}GB`;
-      if (stats.memory.free) {
-        tooltip += `\nFree: ${stats.memory.free}GB`;
-      }
-      if (stats.memory.cached && stats.memory.cached > 0) {
-        tooltip += `\nCached: ${stats.memory.cached}GB`;
-      }
-      if (stats.memory.buffers && stats.memory.buffers > 0) {
-        tooltip += `\nBuffers: ${stats.memory.buffers}GB`;
-      }
+      if (stats.memory.free) tooltip += `\nFree: ${stats.memory.free}GB`;
       memoryStat.title = tooltip;
     }
   }
 
+  // GPU
   const gpuStat = document.getElementById("gpu-stat");
   const gpuUsage = document.getElementById("gpu-usage");
-  if (
-    stats.gpu &&
-    stats.gpu.utilization !== null &&
-    typeof stats.gpu.utilization === "number"
-  ) {
+  if (stats.gpu && stats.gpu.utilization !== null && typeof stats.gpu.utilization === "number") {
     if (gpuStat) {
       gpuStat.style.display = "flex";
-      if (stats.gpu.name) {
-        gpuStat.title = `GPU: ${stats.gpu.name}${stats.gpu.memory ? ` (${stats.gpu.memory}GB)` : ""}`;
-      }
+      const util = Math.max(0, Math.min(100, Math.round(stats.gpu.utilization)));
+      gpuStat.style.setProperty("--stat-fill", util + "%");
+      gpuStat.title = `GPU: ${stats.gpu.name || "Unknown"}${stats.gpu.temp ? ` (${stats.gpu.temp}\u00B0C)` : ""}`;
     }
-    if (gpuUsage) {
-      const utilization = Math.max(
-        0,
-        Math.min(100, Math.round(stats.gpu.utilization)),
-      );
-      gpuUsage.textContent = utilization;
-    }
+    if (gpuUsage) gpuUsage.textContent = Math.round(stats.gpu.utilization);
   } else {
     if (gpuStat) gpuStat.style.display = "none";
   }
 
-  const cpuStat = document.getElementById("cpu-stat");
-  if (cpuStat && stats.cpu) {
-    let title = `CPU: ${stats.cpu.cores} cores`;
-    if (stats.cpu.speed) {
-      title += ` @ ${stats.cpu.speed}GHz`;
+  // Temperature
+  const tempStat = document.getElementById("temp-stat");
+  const cpuTemp = document.getElementById("cpu-temp");
+  if (stats.cpu && stats.cpu.temp && stats.cpu.temp > 0) {
+    if (tempStat) {
+      tempStat.style.display = "flex";
+      tempStat.style.setProperty("--stat-fill", Math.min(100, stats.cpu.temp) + "%");
+      tempStat.title = `CPU Temperature: ${stats.cpu.temp}\u00B0C`;
     }
-    cpuStat.title = title;
+    if (cpuTemp) cpuTemp.textContent = Math.round(stats.cpu.temp);
+  } else {
+    if (tempStat) tempStat.style.display = "none";
   }
+
+  // Battery
+  const batteryStat = document.getElementById("battery-stat");
+  const batteryPercent = document.getElementById("battery-percent");
+  if (stats.battery) {
+    if (batteryStat) {
+      batteryStat.style.display = "flex";
+      batteryStat.style.setProperty("--stat-fill", stats.battery.percent + "%");
+      batteryStat.classList.toggle("charging", stats.battery.charging);
+      const icon = batteryStat.querySelector("i");
+      if (icon) {
+        if (stats.battery.charging) icon.className = "fas fa-bolt";
+        else if (stats.battery.percent > 75) icon.className = "fas fa-battery-full";
+        else if (stats.battery.percent > 50) icon.className = "fas fa-battery-three-quarters";
+        else if (stats.battery.percent > 25) icon.className = "fas fa-battery-half";
+        else if (stats.battery.percent > 10) icon.className = "fas fa-battery-quarter";
+        else icon.className = "fas fa-battery-empty";
+      }
+      let tip = `Battery: ${stats.battery.percent}%`;
+      if (stats.battery.charging) tip += " (Charging)";
+      batteryStat.title = tip;
+    }
+    if (batteryPercent) batteryPercent.textContent = stats.battery.percent;
+  } else {
+    if (batteryStat) batteryStat.style.display = "none";
+  }
+
+
+  // Network
+  const networkStat = document.getElementById("network-stat");
+  const netDown = document.getElementById("net-down");
+  if (stats.network) {
+    if (networkStat) {
+      networkStat.style.display = "flex";
+      const speed = Math.max(stats.network.down, stats.network.up);
+      networkStat.style.setProperty("--stat-fill", Math.min(100, speed / 10) + "%");
+      networkStat.title = `Net: \u2193${stats.network.down} KB/s \u2191${stats.network.up} KB/s`;
+    }
+    if (netDown) netDown.textContent = stats.network.down;
+  } else {
+    if (networkStat) networkStat.style.display = "none";
+  }
+
+  // Uptime
+  const uptimeStat = document.getElementById("uptime-stat");
+  const uptimeDisplay = document.getElementById("uptime-display");
+  if (stats.uptime && stats.uptime > 0) {
+    if (uptimeStat) {
+      uptimeStat.style.display = "flex";
+      uptimeStat.title = `System uptime: ${formatUptimeLong(stats.uptime)}`;
+    }
+    if (uptimeDisplay) uptimeDisplay.textContent = formatUptimeShort(stats.uptime);
+  } else {
+    if (uptimeStat) uptimeStat.style.display = "none";
+  }
+}
+
+function formatUptimeShort(seconds) {
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function formatUptimeLong(seconds) {
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const parts = [];
+  if (d > 0) parts.push(`${d} day${d > 1 ? "s" : ""}`);
+  if (h > 0) parts.push(`${h} hour${h > 1 ? "s" : ""}`);
+  if (m > 0) parts.push(`${m} min`);
+  return parts.join(", ") || "< 1 min";
 }
 
 function startSystemStatsUpdates() {
@@ -2026,6 +2105,7 @@ class SettingsManager {
       sortOrder: "asc",
       startupPath: window.__SPECTERS_DEFAULT_PATH__ || "/",
       startupCommand: "",
+      accentColor: "#64a0ff",
     };
 
     this.currentFiles = [];
@@ -2065,27 +2145,16 @@ class SettingsManager {
 
   applyAccentColor() {
     const { accentColor } = this.settings;
-    document.documentElement.style.setProperty("--accent-primary", accentColor);
-    document.documentElement.style.setProperty("--text-accent", accentColor);
+    if (!accentColor) return;
 
     const rgb = this.hexToRgb(accentColor);
     if (rgb) {
-      const darkerColor = `rgb(${Math.max(0, rgb.r - 20)}, ${Math.max(0, rgb.g - 20)}, ${Math.max(0, rgb.b - 20)})`;
-      document.documentElement.style.setProperty(
-        "--accent-secondary",
-        darkerColor,
-      );
+      document.documentElement.style.setProperty("--accent-color", `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+    }
 
-      const selectionColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`;
-      const selectionHoverColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`;
-      document.documentElement.style.setProperty(
-        "--bg-selected",
-        selectionColor,
-      );
-      document.documentElement.style.setProperty(
-        "--bg-selected-hover",
-        selectionHoverColor,
-      );
+    const colorInput = document.getElementById("accent-color-input");
+    if (colorInput && colorInput.value !== accentColor) {
+      colorInput.value = accentColor;
     }
   }
 
@@ -2095,8 +2164,6 @@ class SettingsManager {
     document.body.setAttribute("data-layout", layoutMode);
 
     const terminalHeader = document.getElementById("terminal-header");
-    const legacyResizeHandle = document.getElementById("terminal-resize-handle");
-    const resizeHandle = terminalHeader || legacyResizeHandle;
     const terminalWrapper = document.getElementById(
       "terminal-container-wrapper",
     );
@@ -2104,16 +2171,13 @@ class SettingsManager {
     const app = document.getElementById("app");
     const fileExplorer = document.querySelector(".file-explorer");
 
-    if (resizeHandle && terminalWrapper) {
-      [terminalHeader, legacyResizeHandle].forEach((handle) => {
-        if (!handle) return;
-        handle.classList.remove(
-          "resize-top",
-          "resize-bottom",
-          "resize-left",
-          "resize-right",
-        );
-      });
+    if (terminalHeader && terminalWrapper) {
+      terminalHeader.classList.remove(
+        "resize-top",
+        "resize-bottom",
+        "resize-left",
+        "resize-right",
+      );
 
       terminalWrapper.style.position = "";
       terminalWrapper.style.width = "";
@@ -2129,7 +2193,7 @@ class SettingsManager {
           if (mainContent && mainContent.contains(terminalWrapper)) {
             app.appendChild(terminalWrapper);
           }
-          resizeHandle.classList.add("resize-top");
+          terminalHeader.classList.add("resize-top");
           if (fileExplorer) fileExplorer.classList.remove("hidden");
           terminalWrapper.classList.remove("hidden");
           terminalVisible = true;
@@ -2143,7 +2207,7 @@ class SettingsManager {
           if (mainContent && !mainContent.contains(terminalWrapper)) {
             mainContent.appendChild(terminalWrapper);
           }
-          resizeHandle.classList.add("resize-left");
+          terminalHeader.classList.add("resize-left");
           if (fileExplorer) fileExplorer.classList.remove("hidden");
           terminalWrapper.classList.remove("hidden");
           terminalVisible = true;
@@ -2430,63 +2494,170 @@ class SettingsManager {
   }
 
   initializeUI() {
-    this.initializeLayoutButton();
+    this.initializePopoutControls();
+    this.initializeTerminalDrag();
     this.initializeSortControls();
     this.initializeTerminalSettings();
     this.initializeSettingsDropdown();
   }
 
-  initializeLayoutButton() {
-    const layoutBtn = document.getElementById("layout-btn");
-    if (layoutBtn) {
-      layoutBtn.addEventListener("click", () => {
-        this.cycleLayout();
+  /** Position a fixed-position dropdown menu below its trigger button, portaled to body */
+  positionDropdownMenu(button, menu, alignRight = false) {
+    // Move menu to body so it escapes any parent backdrop-filter stacking context
+    if (menu.parentElement !== document.body) {
+      document.body.appendChild(menu);
+    }
+    const rect = button.getBoundingClientRect();
+    menu.style.top = `${rect.bottom + 4}px`;
+    if (alignRight) {
+      menu.style.left = "auto";
+      menu.style.right = `${window.innerWidth - rect.right}px`;
+    } else {
+      menu.style.left = `${rect.left}px`;
+      menu.style.right = "auto";
+    }
+    menu.style.minWidth = `${Math.max(rect.width, 120)}px`;
+  }
+
+  initializePopoutControls() {
+    const popoutBtn = document.getElementById("terminal-popout-btn");
+    if (popoutBtn) {
+      popoutBtn.addEventListener("click", () => {
+        if (this.settings.layoutMode === "floating") {
+          this.settings.layoutMode = "integrated";
+          popoutBtn.innerHTML = '<i class="fas fa-up-right-from-square"></i>';
+          popoutBtn.title = "Pop out terminal";
+        } else {
+          this.settings.layoutMode = "floating";
+          popoutBtn.innerHTML = '<i class="fas fa-compress"></i>';
+          popoutBtn.title = "Dock terminal";
+        }
+        this.saveSettings();
       });
-      this.updateLayoutButton();
+      // Set initial state
+      if (this.settings.layoutMode === "floating") {
+        popoutBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        popoutBtn.title = "Dock terminal";
+      }
     }
   }
 
-  cycleLayout() {
-    const layouts = [
-      "integrated",
-      "split",
-      "floating",
-      "explorer-only",
-      "terminal-only",
-    ];
-    const currentIndex = layouts.indexOf(this.settings.layoutMode);
-    const nextIndex = (currentIndex + 1) % layouts.length;
-    this.settings.layoutMode = layouts[nextIndex];
-    this.saveSettings();
-    this.updateLayoutButton();
-    this.applyLayout();
-  }
+  initializeTerminalDrag() {
+    const terminalHeader = document.getElementById("terminal-header");
+    const terminalWrapper = document.getElementById("terminal-container-wrapper");
+    if (!terminalHeader || !terminalWrapper) return;
 
-  updateLayoutButton() {
-    const layoutBtn = document.getElementById("layout-btn");
-    if (!layoutBtn) return;
+    // Inject resize edge elements (no north edges — header is drag-only)
+    const edges = ["s", "e", "w", "sw", "se"];
+    edges.forEach((dir) => {
+      const el = document.createElement("div");
+      el.className = `resize-edge edge-${dir}`;
+      el.dataset.edge = dir;
+      terminalWrapper.appendChild(el);
+    });
 
-    const icons = {
-      integrated: "fas fa-window-restore",
-      split: "fas fa-columns",
-      floating: "fas fa-external-link-alt",
-      "explorer-only": "fas fa-folder",
-      "terminal-only": "fas fa-terminal",
-    };
+    let isDragging = false;
+    let isResizing = false;
+    let resizeDir = "";
+    let dragOffsetX = 0, dragOffsetY = 0;
+    let startRect = null;
+    let startX = 0, startY = 0;
+    const MIN_W = 600, MIN_H = 385;
 
-    const titles = {
-      integrated: "Layout: Integrated Terminal",
-      split: "Layout: Split View",
-      floating: "Layout: Floating Terminal",
-      "explorer-only": "Layout: Explorer Only",
-      "terminal-only": "Layout: Terminal Only",
-    };
+    // Drag from header
+    terminalHeader.addEventListener("mousedown", (e) => {
+      if (this.settings.layoutMode !== "floating") return;
+      if (e.target.closest("button, input, select, textarea, a, .resize-edge")) return;
 
-    const icon = layoutBtn.querySelector("i");
-    if (icon) {
-      icon.className = icons[this.settings.layoutMode];
-    }
-    layoutBtn.title = titles[this.settings.layoutMode];
+      isDragging = true;
+      const rect = terminalWrapper.getBoundingClientRect();
+      dragOffsetX = e.clientX - rect.left;
+      dragOffsetY = e.clientY - rect.top;
+
+      document.body.style.cursor = "grabbing";
+      document.body.style.userSelect = "none";
+      e.preventDefault();
+    });
+
+    // Resize from edges
+    terminalWrapper.addEventListener("mousedown", (e) => {
+      const edge = e.target.closest(".resize-edge");
+      if (!edge || this.settings.layoutMode !== "floating") return;
+
+      isResizing = true;
+      resizeDir = edge.dataset.edge;
+      startRect = terminalWrapper.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+
+      document.body.style.cursor = getComputedStyle(edge).cursor;
+      document.body.style.userSelect = "none";
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        const x = e.clientX - dragOffsetX;
+        const y = e.clientY - dragOffsetY;
+        terminalWrapper.style.left = `${Math.max(0, x)}px`;
+        terminalWrapper.style.top = `${Math.max(0, y)}px`;
+        terminalWrapper.style.right = "auto";
+        terminalWrapper.style.bottom = "auto";
+      } else if (isResizing) {
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        let newLeft = startRect.left;
+        let newTop = startRect.top;
+        let newWidth = startRect.width;
+        let newHeight = startRect.height;
+
+        if (resizeDir.includes("e")) {
+          newWidth = Math.max(MIN_W, startRect.width + dx);
+        }
+        if (resizeDir.includes("s")) {
+          newHeight = Math.max(MIN_H, startRect.height + dy);
+        }
+        if (resizeDir.includes("w")) {
+          const candidateW = startRect.width - dx;
+          if (candidateW >= MIN_W) {
+            newWidth = candidateW;
+            newLeft = startRect.left + dx;
+          } else {
+            newWidth = MIN_W;
+            newLeft = startRect.right - MIN_W;
+          }
+        }
+        if (resizeDir.includes("n")) {
+          const candidateH = startRect.height - dy;
+          if (candidateH >= MIN_H) {
+            newHeight = candidateH;
+            newTop = startRect.top + dy;
+          } else {
+            newHeight = MIN_H;
+            newTop = startRect.bottom - MIN_H;
+          }
+        }
+
+        terminalWrapper.style.left = `${Math.max(0, newLeft)}px`;
+        terminalWrapper.style.top = `${Math.max(0, newTop)}px`;
+        terminalWrapper.style.right = "auto";
+        terminalWrapper.style.bottom = "auto";
+        terminalWrapper.style.width = `${newWidth}px`;
+        terminalWrapper.style.height = `${newHeight}px`;
+
+        if (typeof fitAddon !== "undefined" && fitAddon) fitAddon.fit();
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (!isDragging && !isResizing) return;
+      isDragging = false;
+      isResizing = false;
+      resizeDir = "";
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    });
   }
 
   initializeSortControls() {
@@ -2631,7 +2802,13 @@ class SettingsManager {
 
     button.addEventListener("click", (e) => {
       e.stopPropagation();
-      dropdown.classList.toggle("open");
+      const isOpen = dropdown.classList.toggle("open");
+      if (isOpen) {
+        this.positionDropdownMenu(button, menu, true);
+        menu.classList.add("portal-open");
+      } else {
+        menu.classList.remove("portal-open");
+      }
     });
 
     menu.addEventListener("click", (e) => e.stopPropagation());
@@ -2639,8 +2816,9 @@ class SettingsManager {
     menu.addEventListener("keydown", (e) => e.stopPropagation());
 
     document.addEventListener("click", (e) => {
-      if (!dropdown.contains(e.target)) {
+      if (!dropdown.contains(e.target) && !menu.contains(e.target)) {
         dropdown.classList.remove("open");
+        menu.classList.remove("portal-open");
       }
     });
 
@@ -2654,6 +2832,47 @@ class SettingsManager {
     startupPathInput?.addEventListener("blur", commit);
     startupCommandInput?.addEventListener("change", commit);
     startupCommandInput?.addEventListener("blur", commit);
+
+    const accentColorInput = document.getElementById("accent-color-input");
+    if (accentColorInput) {
+      accentColorInput.value = this.settings.accentColor || "#64a0ff";
+      accentColorInput.addEventListener("input", (e) => {
+        e.stopPropagation();
+        this.settings.accentColor = accentColorInput.value;
+        this.saveSettings({ applyLayout: false });
+        this.updatePresetActive();
+      });
+    }
+
+    const presetContainer = document.getElementById("accent-presets");
+    if (presetContainer) {
+      presetContainer.addEventListener("click", (e) => {
+        const preset = e.target.closest(".accent-preset");
+        if (!preset) return;
+        e.stopPropagation();
+        const rgb = preset.dataset.color;
+        if (!rgb) return;
+        const [r, g, b] = rgb.split(",").map(Number);
+        const hex = "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+        this.settings.accentColor = hex;
+        if (accentColorInput) accentColorInput.value = hex;
+        this.saveSettings({ applyLayout: false });
+        this.updatePresetActive();
+      });
+      this.updatePresetActive();
+    }
+  }
+
+  updatePresetActive() {
+    const presets = document.querySelectorAll(".accent-preset");
+    const currentHex = (this.settings.accentColor || "#64a0ff").toLowerCase();
+    presets.forEach((p) => {
+      const rgb = p.dataset.color;
+      if (!rgb) return;
+      const [r, g, b] = rgb.split(",").map(Number);
+      const hex = "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+      p.classList.toggle("active", hex === currentHex);
+    });
   }
 }
 

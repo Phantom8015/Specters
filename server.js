@@ -110,7 +110,7 @@ app.use(express.static("public"));
  */
 function getDefaultBrowsePath() {
   if (fs.existsSync("/app/managed/home")) return "/app/managed/home";
-  return path.dirname(os.homedir());
+  return os.homedir();
 }
 
 app.get("/", async (req, res) => {
@@ -120,7 +120,7 @@ app.get("/", async (req, res) => {
       "utf8"
     );
     const defaultPath = getDefaultBrowsePath();
-    res.send(html.replace("__SPECTERS_DEFAULT_PATH__", JSON.stringify(defaultPath)));
+    res.send(html.replace("%%DEFAULT_PATH%%", defaultPath));
   } catch (err) {
     res.status(500).send("Failed to load app");
   }
@@ -465,22 +465,35 @@ app.get(
 
 app.get("/api/system-stats", async (req, res) => {
   try {
-    const [cpu, mem, graphics, processLoad] = await Promise.all([
+    const [cpu, mem, graphics, battery, diskLayout, networkStats, cpuTemp, time] = await Promise.all([
       si.currentLoad(),
       si.mem(),
       si.graphics(),
-      si.processLoad("node"),
+      si.battery().catch(() => null),
+      si.fsSize().catch(() => []),
+      si.networkStats().catch(() => []),
+      si.cpuTemperature().catch(() => ({})),
+      si.time(),
     ]);
 
     const cpuLoad = Math.max(0, Math.min(100, Math.round(cpu.currentLoad || 0)));
     const memActualUsed = mem.total - mem.free - (mem.buffers || 0) - (mem.cached || 0);
     const memPercentage = Math.round((memActualUsed / mem.total) * 100);
 
+    const primaryDisk = Array.isArray(diskLayout) && diskLayout.length > 0 ? diskLayout[0] : null;
+    const totalDisk = Array.isArray(diskLayout) ? diskLayout.reduce((a, d) => a + (d.size || 0), 0) : 0;
+    const usedDisk = Array.isArray(diskLayout) ? diskLayout.reduce((a, d) => a + (d.used || 0), 0) : 0;
+
+    const activeNet = Array.isArray(networkStats)
+      ? networkStats.find((n) => n.operstate === "up" && n.iface !== "lo") || networkStats[0]
+      : null;
+
     res.json({
       cpu: {
         load: cpuLoad,
         cores: cpu.cpus?.length || os.cpus().length,
         speed: cpu.cpus?.[0] ? Math.round((cpu.cpus[0].speed / 1000) * 1000) / 1000 : null,
+        temp: cpuTemp.main || null,
       },
       memory: {
         used: Math.round((memActualUsed / 1024 / 1024 / 1024) * 1000) / 1000,
@@ -497,16 +510,25 @@ app.get("/api/system-stats", async (req, res) => {
             utilization: graphics.controllers[0].utilizationGpu !== null
               ? Math.max(0, Math.min(100, Math.round(graphics.controllers[0].utilizationGpu)))
               : null,
+            temp: graphics.controllers[0].temperatureGpu || null,
           }
         : null,
-      process: {
-        memory: processLoad?.list?.[0]
-          ? Math.round((processLoad.list[0].memVsz / 1024 / 1024) * 1000) / 1000
-          : null,
-        cpu: processLoad?.list?.[0]
-          ? Math.round(processLoad.list[0].cpu * 1000) / 1000
-          : null,
-      },
+      disk: primaryDisk
+        ? {
+            used: Math.round((usedDisk / 1024 / 1024 / 1024) * 10) / 10,
+            total: Math.round((totalDisk / 1024 / 1024 / 1024) * 10) / 10,
+            percentage: totalDisk > 0 ? Math.round((usedDisk / totalDisk) * 100) : 0,
+          }
+        : null,
+      network: activeNet
+        ? {
+            down: Math.round(activeNet.rx_sec / 1024) || 0,
+            up: Math.round(activeNet.tx_sec / 1024) || 0,
+            iface: activeNet.iface,
+          }
+        : null,
+      uptime: time.uptime || os.uptime(),
+      os: { platform: os.platform(), hostname: os.hostname() },
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

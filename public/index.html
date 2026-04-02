@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Specters</title>
-    <script>window.__SPECTERS_DEFAULT_PATH__ = __SPECTERS_DEFAULT_PATH__;</script>
+    <script>window.__SPECTERS_DEFAULT_PATH__ = "%%DEFAULT_PATH%%";</script>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="mobile-styles.css" />
     <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
       rel="stylesheet"
     />
 
@@ -18,6 +18,13 @@
     />
   </head>
   <body>
+    <div class="mobile-gate">View this page on Desktop</div>
+    <div id="loading-screen" style="position:fixed;inset:0;z-index:999999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 0.4s ease">
+      <div style="width:200px;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">
+        <div id="loading-bar" style="width:0%;height:100%;border-radius:2px;background:rgba(var(--accent-color,100,160,255),0.8);transition:width 0.3s ease"></div>
+      </div>
+    </div>
+    <div id="specters-bg"></div>
     <div id="app">
       <header class="header">
         <div class="nav-buttons">
@@ -32,13 +39,6 @@
           </button>
           <button id="refresh-btn" class="nav-btn" title="Refresh">
             <i class="fas fa-sync-alt"></i>
-          </button>
-          <button
-            id="layout-btn"
-            class="nav-btn"
-            title="Layout: Integrated Terminal"
-          >
-            <i class="fas fa-window-restore"></i>
           </button>
         </div>
 
@@ -109,6 +109,26 @@
                   placeholder="e.g. ls -la"
                 />
               </div>
+              <div class="menu-separator"></div>
+              <div class="settings-color-row">
+                <label>Accent Color</label>
+                <input
+                  id="accent-color-input"
+                  type="color"
+                  value="#64a0ff"
+                  style="width:32px;height:32px;padding:2px;border-radius:50%;cursor:pointer;background:transparent;border:2px solid rgba(255,255,255,0.15)"
+                />
+              </div>
+              <div class="accent-color-presets" id="accent-presets">
+                <button class="accent-preset" data-color="100,160,255" style="background:#64a0ff" title="Blue"></button>
+                <button class="accent-preset" data-color="168,85,247" style="background:#a855f7" title="Purple"></button>
+                <button class="accent-preset" data-color="236,72,153" style="background:#ec4899" title="Pink"></button>
+                <button class="accent-preset" data-color="239,68,68" style="background:#ef4444" title="Red"></button>
+                <button class="accent-preset" data-color="245,158,11" style="background:#f59e0b" title="Amber"></button>
+                <button class="accent-preset" data-color="34,197,94" style="background:#22c55e" title="Green"></button>
+                <button class="accent-preset" data-color="6,182,212" style="background:#06b6d4" title="Cyan"></button>
+                <button class="accent-preset" data-color="255,255,255" style="background:#ffffff" title="White"></button>
+              </div>
             </div>
           </div>
 
@@ -153,7 +173,7 @@
       <div class="main-content">
         <div class="file-explorer">
           <div class="file-list-container">
-            <div class="file-list-header">
+          <div class="file-list-header" id="file-list-header">
               <div class="file-list-title column-header sortable" data-sort="name">Files<span class="sort-indicator"></span></div>
               <div class="column-header sortable" data-sort="size">Size<span class="sort-indicator"></span></div>
               <div class="column-header sortable" data-sort="date">Date Modified<span class="sort-indicator"></span></div>
@@ -180,15 +200,31 @@
             <div class="system-stats" id="system-stats">
               <div class="stat-item" id="cpu-stat">
                 <i class="fas fa-microchip"></i>
-                <span id="cpu-load">--</span>%
+                <span id="cpu-load">--</span><span class="stat-unit">%</span>
               </div>
               <div class="stat-item" id="memory-stat">
                 <i class="fas fa-memory"></i>
-                <span id="memory-usage">--</span>%
+                <span id="memory-usage">--</span><span class="stat-unit">%</span>
               </div>
               <div class="stat-item" id="gpu-stat" style="display: none">
                 <i class="fas fa-tv"></i>
-                <span id="gpu-usage">--</span>%
+                <span id="gpu-usage">--</span><span class="stat-unit">%</span>
+              </div>
+              <div class="stat-item" id="temp-stat" style="display: none">
+                <i class="fas fa-temperature-half"></i>
+                <span id="cpu-temp">--</span><span class="stat-unit">&deg;C</span>
+              </div>
+              <div class="stat-item" id="battery-stat" style="display: none">
+                <i class="fas fa-battery-full"></i>
+                <span id="battery-percent">--</span><span class="stat-unit">%</span>
+              </div>
+              <div class="stat-item" id="network-stat" style="display: none">
+                <i class="fas fa-network-wired"></i>
+                <span id="net-down">--</span><span class="stat-unit">KB/s</span>
+              </div>
+              <div class="stat-item" id="uptime-stat" style="display: none">
+                <i class="fas fa-clock"></i>
+                <span id="uptime-display">--</span>
               </div>
             </div>
             <div class="terminal-controls">
@@ -209,6 +245,9 @@
                   <i class="fas fa-plus"></i>
                 </button>
               </div>
+              <button id="terminal-popout-btn" class="panel-popout-btn" title="Pop out terminal">
+                <i class="fas fa-up-right-from-square"></i>
+              </button>
             </div>
           </div>
           <div id="terminal-container" class="xterm-glassy"></div>
@@ -447,12 +486,24 @@
 
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        wrapper.classList.toggle("open");
+        const isOpen = wrapper.classList.toggle("open");
+        if (isOpen && menu) {
+          if (menu.parentElement !== document.body) document.body.appendChild(menu);
+          const r = btn.getBoundingClientRect();
+          menu.style.top = (r.bottom + 4) + "px";
+          menu.style.left = "auto";
+          menu.style.right = (window.innerWidth - r.right) + "px";
+          menu.style.minWidth = Math.max(r.width, 200) + "px";
+          menu.classList.add("portal-open");
+        } else if (menu) {
+          menu.classList.remove("portal-open");
+        }
       });
       menu.addEventListener("click", (e) => e.stopPropagation());
       document.addEventListener("click", (e) => {
-        if (!wrapper.contains(e.target)) {
+        if (!wrapper.contains(e.target) && !menu.contains(e.target)) {
           wrapper.classList.remove("open");
+          menu.classList.remove("portal-open");
         }
       });
 
@@ -522,6 +573,41 @@
           btn.textContent = "Update Password";
         }
       });
+    })();
+    </script>
+    <script>
+    (function() {
+      const bar = document.getElementById("loading-bar");
+      const screen = document.getElementById("loading-screen");
+      if (!bar || !screen) return;
+
+      let progress = 0;
+      const resources = document.querySelectorAll('link[rel="stylesheet"], script[src]');
+      const total = resources.length + 1; // +1 for window load
+      let loaded = 0;
+
+      function tick() {
+        loaded++;
+        progress = Math.min(95, (loaded / total) * 100);
+        bar.style.width = progress + "%";
+      }
+
+      resources.forEach((el) => {
+        if (el.complete || el.sheet) { tick(); return; }
+        el.addEventListener("load", tick);
+        el.addEventListener("error", tick);
+      });
+
+      function finish() {
+        bar.style.width = "100%";
+        setTimeout(() => {
+          screen.style.opacity = "0";
+          setTimeout(() => screen.remove(), 400);
+        }, 200);
+      }
+
+      if (document.readyState === "complete") { finish(); }
+      else { window.addEventListener("load", finish); }
     })();
     </script>
   </body>

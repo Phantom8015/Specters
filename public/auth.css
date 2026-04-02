@@ -1,23 +1,50 @@
+/* ─── AUTH DESIGN TOKENS (matching main app) ─── */
+
 :root {
-  --bg-primary: #0f1419;
-  --bg-secondary: rgba(24, 26, 32, 0.85);
+  --accent-color: 100, 160, 255;
+
+  --accent-rgb: rgb(var(--accent-color));
+  --accent-bright: rgba(var(--accent-color), 1);
+  --accent-medium: rgba(var(--accent-color), 0.8);
+  --accent-dim: rgba(var(--accent-color), 0.6);
+  --accent-subtle: rgba(var(--accent-color), 0.3);
+  --accent-faint: rgba(var(--accent-color), 0.15);
+  --accent-very-faint: rgba(var(--accent-color), 0.08);
+
+  --bg-primary: #000000;
+  --bg-secondary: rgba(0, 0, 0, 0.2);
   --bg-tertiary: rgba(255, 255, 255, 0.05);
   --bg-hover: rgba(255, 255, 255, 0.08);
 
-  --text-primary: #d4d4d4;
-  --text-secondary: #888888;
-  --text-muted: #555;
+  --text-primary: #ffffff;
+  --text-secondary: #b8b8b8;
+  --text-muted: #666;
 
   --border-primary: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(100, 160, 255, 0.5);
+  --border-focus: rgba(var(--accent-color), 0.5);
 
-  --accent: #64a0ff;
-  --accent-hover: #4080ff;
   --success: #4caf50;
   --error: #ff5370;
   --warning: #ffcb6b;
 
-  --glass-blur: 16px;
+  --glass-blur: 20px;
+  --glass-bg: rgba(0, 0, 0, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  --gradient-1: rgba(var(--accent-color), 0.3);
+  --gradient-2: rgba(var(--accent-color), 0.2);
+  --gradient-3: rgba(var(--accent-color), 0.25);
+  --gradient-4: rgba(var(--accent-color), 0.15);
+  --gradient-5: rgba(var(--accent-color), 0.1);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  --transition-fast: all 0.2s ease;
+  --transition-normal: all 0.3s ease;
+  --transition-slow: all 0.5s ease;
 }
 
 *,
@@ -28,8 +55,26 @@
   box-sizing: border-box;
 }
 
+/* ─── ANIMATED BACKGROUND ─── */
+
+#specters-bg {
+  position: fixed;
+  inset: -20vh;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 25%, var(--gradient-1) 0%, transparent 40%),
+    radial-gradient(circle at 85% 15%, var(--gradient-2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, var(--gradient-3) 0%, transparent 45%),
+    radial-gradient(circle at 25% 60%, var(--gradient-4) 0%, transparent 55%),
+    radial-gradient(circle at 75% 55%, var(--gradient-5) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.8) 0%, #000 100%);
+}
+
+/* ─── BODY ─── */
+
 body {
-  background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
+  background: #000;
   min-height: 100vh;
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
@@ -39,38 +84,54 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  overflow: hidden;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(100, 160, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(100, 160, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
-}
+/* ─── AUTH PAGE ─── */
 
 .auth-page {
   position: relative;
   z-index: 1;
   width: 100%;
   max-width: 420px;
+  animation: authFadeIn 0.6s ease;
 }
 
-.auth-card {
-  background: rgba(18, 20, 28, 0.9);
-  border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  padding: 40px 36px;
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+@keyframes authFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
+
+/* ─── AUTH CARD (glass) ─── */
+
+.auth-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 40px 36px;
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 0 80px -20px rgba(var(--accent-color), 0.08);
+  transition: var(--transition-slow);
+}
+
+.auth-card:hover {
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 0 100px -20px rgba(var(--accent-color), 0.12);
+}
+
+/* ─── LOGO ─── */
 
 .auth-logo {
   text-align: center;
@@ -81,21 +142,33 @@ body::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
-  background: rgba(100, 160, 255, 0.12);
-  border: 1px solid rgba(100, 160, 255, 0.25);
-  border-radius: 14px;
+  width: 56px;
+  height: 56px;
+  background: var(--accent-faint);
+  border: 1px solid var(--accent-subtle);
+  border-radius: var(--radius-lg);
   margin-bottom: 14px;
-  font-size: 22px;
-  color: var(--accent);
+  font-size: 24px;
+  color: var(--accent-rgb);
+  transition: var(--transition-normal);
+  animation: floatLogo 6s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.auth-logo-icon:hover {
+  background: rgba(var(--accent-color), 0.2);
+  border-color: var(--accent-dim);
 }
 
 .auth-logo-name {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
 }
 
 .auth-logo-sub {
@@ -103,6 +176,8 @@ body::before {
   color: var(--text-secondary);
   margin-top: 4px;
 }
+
+/* ─── TITLES ─── */
 
 .auth-title {
   font-size: 16px;
@@ -117,6 +192,8 @@ body::before {
   margin-bottom: 24px;
   line-height: 1.6;
 }
+
+/* ─── FORM ─── */
 
 .auth-form {
   display: flex;
@@ -141,13 +218,13 @@ body::before {
 .form-input {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-primary);
-  border-radius: 6px;
-  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
   color: var(--text-primary);
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s, background 0.2s;
+  transition: var(--transition-fast);
   user-select: text;
   -webkit-user-select: text;
   width: 100%;
@@ -156,6 +233,7 @@ body::before {
 .form-input:focus {
   border-color: var(--border-focus);
   background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(var(--accent-color), 0.1);
 }
 
 .form-input::placeholder {
@@ -164,7 +242,10 @@ body::before {
 
 .form-input.error {
   border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(255, 83, 112, 0.1);
 }
+
+/* ─── INPUT TOGGLE (password visibility) ─── */
 
 .input-wrapper {
   position: relative;
@@ -185,12 +266,14 @@ body::before {
   cursor: pointer;
   padding: 4px;
   font-size: 13px;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .input-toggle:hover {
-  color: var(--text-secondary);
+  color: var(--accent-rgb);
 }
+
+/* ─── PASSWORD STRENGTH ─── */
 
 .password-strength {
   margin-top: 6px;
@@ -207,45 +290,49 @@ body::before {
   height: 3px;
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.08);
-  transition: background 0.3s;
+  transition: background 0.3s ease;
 }
 
 .strength-segment.active-weak   { background: var(--error); }
 .strength-segment.active-fair   { background: var(--warning); }
-.strength-segment.active-good   { background: #4caf50; }
-.strength-segment.active-strong { background: var(--accent); }
+.strength-segment.active-good   { background: var(--success); }
+.strength-segment.active-strong { background: var(--accent-rgb); }
 
 .strength-label {
   font-size: 11px;
   color: var(--text-muted);
 }
 
+/* ─── AUTH BUTTON ─── */
+
 .auth-btn {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 11px 16px;
+  background: var(--accent-faint);
+  color: var(--accent-bright);
+  border: 1px solid var(--accent-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   width: 100%;
-  transition: background 0.2s, opacity 0.2s, transform 0.1s;
+  transition: var(--transition-fast);
   margin-top: 4px;
   position: relative;
   overflow: hidden;
 }
 
 .auth-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: rgba(var(--accent-color), 0.25);
+  border-color: var(--accent-dim);
+  box-shadow: 0 4px 20px rgba(var(--accent-color), 0.15);
 }
 
 .auth-btn:active:not(:disabled) {
-  transform: scale(0.99);
+  opacity: 0.9;
 }
 
 .auth-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -259,23 +346,26 @@ body::before {
   justify-content: center;
 }
 
+/* ─── ERROR / SUCCESS MESSAGES ─── */
+
 .auth-error,
 .auth-success {
-  padding: 10px 12px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   display: none;
+  backdrop-filter: blur(8px);
 }
 
 .auth-error {
-  background: rgba(255, 83, 112, 0.1);
-  border: 1px solid rgba(255, 83, 112, 0.3);
+  background: rgba(255, 83, 112, 0.08);
+  border: 1px solid rgba(255, 83, 112, 0.2);
   color: var(--error);
 }
 
 .auth-success {
-  background: rgba(76, 175, 80, 0.1);
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background: rgba(76, 175, 80, 0.08);
+  border: 1px solid rgba(76, 175, 80, 0.2);
   color: var(--success);
 }
 
@@ -284,7 +374,16 @@ body::before {
   display: flex;
   align-items: center;
   gap: 8px;
+  animation: shakeIn 0.3s ease;
 }
+
+@keyframes shakeIn {
+  0% { opacity: 0; transform: translateX(-6px); }
+  50% { transform: translateX(3px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── DIVIDER & FOOTER ─── */
 
 .auth-divider {
   height: 1px;
@@ -300,15 +399,17 @@ body::before {
 }
 
 .auth-link {
-  color: var(--accent);
+  color: var(--accent-rgb);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .auth-link:hover {
-  color: var(--accent-hover);
+  color: var(--accent-bright);
   text-decoration: underline;
 }
+
+/* ─── SETUP STEPS ─── */
 
 .setup-steps {
   display: flex;
@@ -324,10 +425,11 @@ body::before {
   gap: 6px;
   font-size: 12px;
   color: var(--text-muted);
+  transition: var(--transition-normal);
 }
 
 .step.active {
-  color: var(--accent);
+  color: var(--accent-rgb);
 }
 
 .step.done {
@@ -335,8 +437,8 @@ body::before {
 }
 
 .step-num {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -346,17 +448,19 @@ body::before {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  transition: var(--transition-normal);
 }
 
 .step.active .step-num {
-  background: rgba(100, 160, 255, 0.2);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--accent-faint);
+  border-color: var(--accent-subtle);
+  color: var(--accent-rgb);
+  box-shadow: 0 0 12px rgba(var(--accent-color), 0.15);
 }
 
 .step.done .step-num {
-  background: rgba(76, 175, 80, 0.2);
-  border-color: var(--success);
+  background: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.35);
   color: var(--success);
 }
 
@@ -366,6 +470,8 @@ body::before {
   background: rgba(255, 255, 255, 0.08);
   max-width: 40px;
 }
+
+/* ─── REQUIREMENTS LIST ─── */
 
 .requirements {
   font-size: 12px;
@@ -381,39 +487,43 @@ body::before {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .requirements li i {
   width: 12px;
   flex-shrink: 0;
+  font-size: 10px;
 }
 
 .requirements li.met {
   color: var(--success);
 }
 
+/* ─── ADMIN LAYOUT ─── */
+
 .admin-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 13px;
 }
 
 .admin-header {
-  background: rgba(18, 20, 28, 0.9);
-  border-bottom: 1px solid var(--border-primary);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
   padding: 0 24px;
   height: 52px;
   display: flex;
   align-items: center;
   gap: 16px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .admin-header-title {
@@ -426,7 +536,7 @@ body::before {
 }
 
 .admin-header-title i {
-  color: var(--accent);
+  color: var(--accent-rgb);
   font-size: 14px;
 }
 
@@ -436,58 +546,70 @@ body::before {
 
 .admin-back-btn,
 .admin-action-btn {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-primary);
   color: var(--text-secondary);
   padding: 6px 12px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .admin-back-btn:hover,
 .admin-action-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .admin-action-btn.primary {
-  background: rgba(100, 160, 255, 0.15);
-  border-color: rgba(100, 160, 255, 0.3);
-  color: var(--accent);
+  background: var(--accent-faint);
+  border-color: var(--accent-subtle);
+  color: var(--accent-rgb);
 }
 
 .admin-action-btn.primary:hover {
-  background: rgba(100, 160, 255, 0.25);
+  background: rgba(var(--accent-color), 0.25);
 }
 
 .admin-action-btn.danger {
-  background: rgba(255, 83, 112, 0.1);
-  border-color: rgba(255, 83, 112, 0.25);
+  background: rgba(255, 83, 112, 0.08);
+  border-color: rgba(255, 83, 112, 0.2);
   color: var(--error);
 }
 
 .admin-action-btn.danger:hover {
-  background: rgba(255, 83, 112, 0.2);
+  background: rgba(255, 83, 112, 0.15);
 }
+
+/* ─── ADMIN BODY ─── */
 
 .admin-body {
   flex: 1;
   padding: 24px;
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .admin-section {
-  background: rgba(18, 20, 28, 0.7);
-  border: 1px solid var(--border-primary);
-  border-radius: 10px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   margin-bottom: 20px;
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  transition: var(--transition-normal);
+}
+
+.admin-section:hover {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .admin-section-header {
@@ -504,6 +626,8 @@ body::before {
   color: var(--text-primary);
   flex: 1;
 }
+
+/* ─── USERS TABLE ─── */
 
 .users-table {
   width: 100%;
@@ -534,21 +658,21 @@ body::before {
 }
 
 .users-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .user-avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(100, 160, 255, 0.15);
-  border: 1px solid rgba(100, 160, 255, 0.25);
+  background: var(--accent-faint);
+  border: 1px solid var(--accent-subtle);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-rgb);
   text-transform: uppercase;
   margin-right: 8px;
 }
@@ -557,23 +681,37 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
   font-size: 11px;
   font-weight: 500;
 }
 
-.role-badge.admin     { background: rgba(100, 160, 255, 0.15); color: var(--accent); border: 1px solid rgba(100, 160, 255, 0.25); }
-.role-badge.readwrite { background: rgba(76, 175, 80, 0.12); color: #4caf50; border: 1px solid rgba(76, 175, 80, 0.25); }
-.role-badge.readonly  { background: rgba(255, 203, 107, 0.1); color: var(--warning); border: 1px solid rgba(255, 203, 107, 0.2); }
+.role-badge.admin {
+  background: var(--accent-faint);
+  color: var(--accent-rgb);
+  border: 1px solid var(--accent-subtle);
+}
+
+.role-badge.readwrite {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.25);
+}
+
+.role-badge.readonly {
+  background: rgba(255, 203, 107, 0.08);
+  color: var(--warning);
+  border: 1px solid rgba(255, 203, 107, 0.2);
+}
 
 .perm-tag {
   display: inline-flex;
   align-items: center;
-  padding: 1px 6px;
-  border-radius: 3px;
+  padding: 2px 8px;
+  border-radius: 12px;
   font-size: 10px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
   margin: 1px 2px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -585,12 +723,14 @@ body::before {
   justify-content: flex-end;
 }
 
+/* ─── MODAL ─── */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -598,7 +738,7 @@ body::before {
   padding: 24px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s ease;
 }
 
 .modal-overlay.open {
@@ -607,20 +747,22 @@ body::before {
 }
 
 .modal-box {
-  background: rgba(18, 20, 28, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  transform: translateY(10px);
-  transition: transform 0.2s;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  transform: translateY(12px) scale(0.97);
+  transition: transform 0.3s ease;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
 }
 
 .modal-overlay.open .modal-box {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .modal-head {
@@ -645,7 +787,7 @@ body::before {
   font-size: 16px;
   padding: 4px;
   line-height: 1;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .modal-close-btn:hover {
@@ -681,14 +823,14 @@ body::before {
 .modal-body select {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-primary);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 8px 10px;
   color: var(--text-primary);
   font-size: 13px;
   font-family: inherit;
   outline: none;
   width: 100%;
-  transition: border-color 0.2s;
+  transition: var(--transition-fast);
   user-select: text;
   -webkit-user-select: text;
 }
@@ -696,11 +838,14 @@ body::before {
 .modal-body .form-input:focus,
 .modal-body select:focus {
   border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(var(--accent-color), 0.08);
 }
 
 .modal-body select option {
-  background: #1a1f2e;
+  background: #111;
 }
+
+/* ─── PERMISSIONS GRID ─── */
 
 .perm-grid {
   display: grid;
@@ -713,24 +858,25 @@ body::before {
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: var(--transition-fast);
   user-select: none;
   -webkit-user-select: none;
 }
 
 .perm-check:hover {
   background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .perm-check input[type="checkbox"] {
   width: 14px;
   height: 14px;
   cursor: pointer;
-  accent-color: var(--accent);
+  accent-color: var(--accent-rgb);
 }
 
 .perm-check-label {
@@ -738,6 +884,8 @@ body::before {
   color: var(--text-secondary);
   text-transform: capitalize;
 }
+
+/* ─── PATHS LIST ─── */
 
 .paths-list {
   display: flex;
@@ -761,36 +909,40 @@ body::before {
   color: var(--error);
   width: 30px;
   height: 30px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .path-remove-btn:hover {
   background: rgba(255, 83, 112, 0.1);
+  border-color: rgba(255, 83, 112, 0.35);
 }
 
 .add-path-btn {
   background: none;
-  border: 1px dashed rgba(100, 160, 255, 0.25);
-  color: var(--accent);
+  border: 1px dashed var(--accent-subtle);
+  color: var(--accent-rgb);
   padding: 7px 10px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   cursor: pointer;
   width: 100%;
   text-align: center;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .add-path-btn:hover {
-  background: rgba(100, 160, 255, 0.06);
+  background: var(--accent-very-faint);
+  border-color: var(--accent-dim);
 }
+
+/* ─── CONFIRM DELETE ─── */
 
 .confirm-delete {
   padding: 16px;
@@ -802,6 +954,8 @@ body::before {
 .confirm-delete strong {
   color: var(--text-primary);
 }
+
+/* ─── UTILITIES ─── */
 
 .text-muted {
   color: var(--text-muted);
@@ -821,46 +975,56 @@ body::before {
   display: block;
 }
 
+/* ─── BUTTONS ─── */
+
 .btn-primary {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 5px;
+  background: var(--accent-faint);
+  color: var(--accent-rgb);
+  border: 1px solid var(--accent-subtle);
+  border-radius: var(--radius-sm);
   padding: 8px 16px;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: var(--transition-fast);
 }
-.btn-primary:hover { background: var(--accent-hover); }
+
+.btn-primary:hover {
+  background: rgba(var(--accent-color), 0.25);
+  border-color: var(--accent-dim);
+}
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-primary);
   color: var(--text-secondary);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 8px 16px;
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
+
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
 }
 
 .btn-danger {
-  background: rgba(255, 83, 112, 0.15);
-  border: 1px solid rgba(255, 83, 112, 0.3);
+  background: rgba(255, 83, 112, 0.1);
+  border: 1px solid rgba(255, 83, 112, 0.25);
   color: var(--error);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 8px 16px;
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
+
 .btn-danger:hover {
-  background: rgba(255, 83, 112, 0.25);
+  background: rgba(255, 83, 112, 0.2);
 }
+
+/* ─── NOTIFICATIONS ─── */
 
 .notif {
   position: fixed;
@@ -874,25 +1038,56 @@ body::before {
 }
 
 .notif-item {
-  background: rgba(24, 26, 32, 0.95);
-  border: 1px solid var(--border-primary);
-  border-radius: 7px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
   padding: 10px 14px;
   font-size: 13px;
   color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
-  backdrop-filter: blur(8px);
-  animation: slideIn 0.2s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(var(--glass-blur));
+  animation: notifSlide 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   min-width: 220px;
 }
 
 .notif-item.success { border-left: 3px solid var(--success); }
 .notif-item.error   { border-left: 3px solid var(--error); }
 
-@keyframes slideIn {
+@keyframes notifSlide {
   from { opacity: 0; transform: translateX(20px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── MOBILE ─── */
+
+@media screen and (max-width: 480px) {
+  body {
+    padding: 16px;
+  }
+
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: var(--radius-lg);
+  }
+
+  .auth-logo-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .auth-logo-name {
+    font-size: 20px;
+  }
+
+  .setup-steps span:not(.step-num) {
+    display: none;
+  }
+
+  .perm-grid {
+    grid-template-columns: 1fr;
+  }
 }
