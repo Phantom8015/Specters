@@ -1673,7 +1673,7 @@ select:focus {
 [data-layout="floating"] .terminal-container-wrapper {
   position: fixed;
   top: calc(100vh - 385px - 20px);
-  left: calc(100vw - 600px - 20px);
+  left: calc(100vw - 600px - 100px);
   width: 675px;
   height: 385px;
   z-index: 1001;
