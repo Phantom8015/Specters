@@ -1674,7 +1674,7 @@ select:focus {
   position: fixed;
   top: calc(100vh - 385px - 20px);
   left: calc(100vw - 600px - 20px);
-  width: 600px;
+  width: 675px;
   height: 385px;
   z-index: 1001;
   margin: 0;
