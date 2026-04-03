@@ -57,14 +57,18 @@ function openTerminal() {
   terminalMinimized = false;
 
   if (!terminal) {
+    const accentRGB = getComputedStyle(document.documentElement).getPropertyValue("--accent-color").trim() || "100, 160, 255";
+    const cursorColor = `rgb(${accentRGB})`;
     terminal = new window.Terminal({
+      allowTransparency: true,
       cursorBlink: true,
-      cursorInactiveStyle: "outline",
-      cursorWidth: 1,
+      cursorStyle: "bar",
+      cursorWidth: 2,
+      cursorInactiveStyle: "none",
       theme: {
         background: "rgba(0, 0, 0, 0)",
         foreground: "#d4d4d4",
-        cursor: "#d4d4d4",
+        cursor: cursorColor,
         cursorAccent: "#12141b",
         black: "#12141b",
         red: "#ff5370",
@@ -91,7 +95,7 @@ function openTerminal() {
     });
 
     terminal.open(document.getElementById("terminal-container"));
-
+    terminal.options.cursorBlink = true;
     if (fitAddon) {
       terminal.loadAddon(fitAddon);
       setTimeout(() => {
@@ -2818,7 +2822,6 @@ class SettingsManager {
     document.addEventListener("click", (e) => {
       if (!dropdown.contains(e.target) && !menu.contains(e.target)) {
         dropdown.classList.remove("open");
-        menu.classList.remove("portal-open");
       }
     });
 

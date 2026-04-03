@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/Phantom8015/Specters/refs/heads/main/website/favicon.png" width="150" height="150"/>
+<img src="https://raw.githubusercontent.com/Phantom8015/Specters/refs/heads/main/favicon.png" width="150" height="150"/>
 </p>
 <h1 align="center">Specters</h1>
 <p align="center">Specters is a powerful web-based file explorer with terminal integration, system monitoring, and modern UI. Built with Node.js and designed for efficiency and ease of use.</p>
