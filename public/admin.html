@@ -10,7 +10,12 @@
       rel="stylesheet"
     />
     <style>
-      body { display: block; padding: 0; background: #000; overflow: auto; }
+      body {
+        display: block;
+        padding: 0;
+        background: #000;
+        overflow: auto;
+      }
     </style>
   </head>
   <body>
@@ -22,7 +27,10 @@
           User Management
         </div>
         <div class="admin-header-spacer"></div>
-        <span id="current-user-display" style="font-size:12px; color: var(--text-muted); margin-right: 8px;"></span>
+        <span
+          id="current-user-display"
+          style="font-size: 12px; color: var(--text-muted); margin-right: 8px"
+        ></span>
         <a href="/" class="admin-back-btn">
           <i class="fas fa-arrow-left"></i> Back to App
         </a>
@@ -32,7 +40,10 @@
         <div class="admin-section">
           <div class="admin-section-header">
             <div class="admin-section-title">
-              <i class="fas fa-users" style="color: var(--accent); margin-right: 6px;"></i>
+              <i
+                class="fas fa-users"
+                style="color: var(--accent); margin-right: 6px"
+              ></i>
               Users
             </div>
             <button class="admin-action-btn primary" id="add-user-btn">
@@ -63,16 +74,44 @@
         <div class="modal-body" id="modal-body">
           <div class="form-group">
             <label class="form-label" for="m-username">Username</label>
-            <input type="text" class="form-input" id="m-username" placeholder="e.g. alice" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" />
+            <input
+              type="text"
+              class="form-input"
+              id="m-username"
+              placeholder="e.g. alice"
+              maxlength="32"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+            />
           </div>
 
           <div class="form-group" id="m-password-group">
             <label class="form-label" for="m-password">
-              Password <span id="m-password-hint" style="font-weight:400; text-transform:none; letter-spacing:0"></span>
+              Password
+              <span
+                id="m-password-hint"
+                style="
+                  font-weight: 400;
+                  text-transform: none;
+                  letter-spacing: 0;
+                "
+              ></span>
             </label>
             <div class="input-wrapper">
-              <input type="password" class="form-input" id="m-password" placeholder="Enter password (min 8 chars)" autocomplete="new-password" />
-              <button type="button" class="input-toggle" id="m-toggle-pass" tabindex="-1">
+              <input
+                type="password"
+                class="form-input"
+                id="m-password"
+                placeholder="Enter password (min 8 chars)"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="input-toggle"
+                id="m-toggle-pass"
+                tabindex="-1"
+              >
                 <i class="fas fa-eye"></i>
               </button>
             </div>
@@ -81,49 +120,99 @@
           <div class="form-group">
             <label class="form-label" for="m-role">Role</label>
             <select class="form-input" id="m-role">
-              <option value="readonly">Read-only — can browse and download</option>
-              <option value="readwrite" selected>Read/Write — can also upload, create, edit</option>
-              <option value="admin">Admin — full access, can manage users</option>
+              <option value="readonly">
+                Read-only — can browse and download
+              </option>
+              <option value="readwrite" selected>
+                Read/Write — can also upload, create, edit
+              </option>
+              <option value="admin">
+                Admin — full access, can manage users
+              </option>
             </select>
           </div>
 
           <div id="m-terminal-section">
-            <label class="perm-check" style="width:100%">
+            <label class="perm-check" style="width: 100%">
               <input type="checkbox" id="perm-execute" />
               <span class="perm-check-label">
-                <i class="fas fa-terminal" style="margin-right:6px; width:12px"></i>
+                <i
+                  class="fas fa-terminal"
+                  style="margin-right: 6px; width: 12px"
+                ></i>
                 Allow terminal access
-                <span style="font-weight:400; color: var(--text-muted); margin-left:4px">(role sets file permissions)</span>
+                <span
+                  style="
+                    font-weight: 400;
+                    color: var(--text-muted);
+                    margin-left: 4px;
+                  "
+                  >(role sets file permissions)</span
+                >
               </span>
             </label>
           </div>
 
           <div id="m-paths-section">
-            <label class="form-label" style="display:block; margin-bottom:8px">Directory Access</label>
-            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px">
+            <label class="form-label" style="display: block; margin-bottom: 8px"
+              >Directory Access</label
+            >
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                margin-bottom: 10px;
+              "
+            >
               <label class="perm-check">
-                <input type="radio" name="path-mode" value="all" id="path-mode-all" checked />
+                <input
+                  type="radio"
+                  name="path-mode"
+                  value="all"
+                  id="path-mode-all"
+                  checked
+                />
                 <span class="perm-check-label">
-                  <i class="fas fa-globe" style="margin-right:6px; width:12px"></i>
+                  <i
+                    class="fas fa-globe"
+                    style="margin-right: 6px; width: 12px"
+                  ></i>
                   Allow everything
                 </span>
               </label>
               <label class="perm-check">
-                <input type="radio" name="path-mode" value="allowlist" id="path-mode-allow" />
+                <input
+                  type="radio"
+                  name="path-mode"
+                  value="allowlist"
+                  id="path-mode-allow"
+                />
                 <span class="perm-check-label">
-                  <i class="fas fa-list-check" style="margin-right:6px; width:12px"></i>
+                  <i
+                    class="fas fa-list-check"
+                    style="margin-right: 6px; width: 12px"
+                  ></i>
                   Only allow specific paths
                 </span>
               </label>
               <label class="perm-check">
-                <input type="radio" name="path-mode" value="denylist" id="path-mode-deny" />
+                <input
+                  type="radio"
+                  name="path-mode"
+                  value="denylist"
+                  id="path-mode-deny"
+                />
                 <span class="perm-check-label">
-                  <i class="fas fa-ban" style="margin-right:6px; width:12px"></i>
+                  <i
+                    class="fas fa-ban"
+                    style="margin-right: 6px; width: 12px"
+                  ></i>
                   Block specific paths (allow rest)
                 </span>
               </label>
             </div>
-            <div id="m-paths-list-wrapper" style="display:none">
+            <div id="m-paths-list-wrapper" style="display: none">
               <div class="paths-list" id="m-paths-list"></div>
               <button type="button" class="add-path-btn" id="add-path-btn">
                 <i class="fas fa-plus"></i> Add path
@@ -131,7 +220,7 @@
             </div>
           </div>
 
-          <div class="auth-error" id="modal-error" style="margin-top:4px">
+          <div class="auth-error" id="modal-error" style="margin-top: 4px">
             <i class="fas fa-exclamation-circle"></i>
             <span id="modal-error-text"></span>
           </div>
@@ -144,10 +233,13 @@
     </div>
 
     <div class="modal-overlay" id="delete-modal">
-      <div class="modal-box" style="max-width:380px">
+      <div class="modal-box" style="max-width: 380px">
         <div class="modal-head">
           <div class="modal-head-title" style="color: var(--error)">
-            <i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>
+            <i
+              class="fas fa-exclamation-triangle"
+              style="margin-right: 6px"
+            ></i>
             Delete User
           </div>
           <button class="modal-close-btn" id="delete-modal-close">
@@ -165,19 +257,33 @@
     </div>
 
     <div class="modal-overlay" id="passwd-modal">
-      <div class="modal-box" style="max-width:400px">
+      <div class="modal-box" style="max-width: 400px">
         <div class="modal-head">
           <div class="modal-head-title">Change Password</div>
-          <button class="modal-close-btn" id="passwd-modal-close"><i class="fas fa-times"></i></button>
+          <button class="modal-close-btn" id="passwd-modal-close">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">New Password</label>
-            <input type="password" class="form-input" id="new-pass" placeholder="Min 8 characters" autocomplete="new-password" />
+            <input
+              type="password"
+              class="form-input"
+              id="new-pass"
+              placeholder="Min 8 characters"
+              autocomplete="new-password"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Confirm New Password</label>
-            <input type="password" class="form-input" id="new-pass-confirm" placeholder="Repeat password" autocomplete="new-password" />
+            <input
+              type="password"
+              class="form-input"
+              id="new-pass-confirm"
+              placeholder="Repeat password"
+              autocomplete="new-password"
+            />
           </div>
           <div class="auth-error" id="passwd-error">
             <i class="fas fa-exclamation-circle"></i>
@@ -192,98 +298,128 @@
     </div>
 
     <script>
-    // Apply persisted accent color
-    (function() {
-      try {
-        const saved = localStorage.getItem("fileExplorerSettings");
-        if (saved) {
-          const settings = JSON.parse(saved);
-          if (settings.accentColor) {
-            const hex = settings.accentColor;
-            const r = parseInt(hex.slice(1,3), 16);
-            const g = parseInt(hex.slice(3,5), 16);
-            const b = parseInt(hex.slice(5,7), 16);
-            if (!isNaN(r)) document.documentElement.style.setProperty("--accent-color", `${r}, ${g}, ${b}`);
+      (function () {
+        try {
+          const saved = localStorage.getItem("fileExplorerSettings");
+          if (saved) {
+            const settings = JSON.parse(saved);
+            if (settings.accentColor) {
+              const hex = settings.accentColor;
+              const r = parseInt(hex.slice(1, 3), 16);
+              const g = parseInt(hex.slice(3, 5), 16);
+              const b = parseInt(hex.slice(5, 7), 16);
+              if (!isNaN(r))
+                document.documentElement.style.setProperty(
+                  "--accent-color",
+                  `${r}, ${g}, ${b}`,
+                );
+            }
           }
+        } catch (_) {}
+      })();
+
+      let users = [];
+      let currentUser = null;
+      let editingUserId = null;
+      let deletingUserId = null;
+      let changingPassUserId = null;
+
+      function notify(msg, type = "success") {
+        const notif = document.getElementById("notif");
+        const item = document.createElement("div");
+        item.className = `notif-item ${type}`;
+        item.innerHTML = `<i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i> ${msg}`;
+        notif.appendChild(item);
+        setTimeout(() => item.remove(), 3000);
+      }
+
+      async function init() {
+        try {
+          const res = await fetch("/api/auth/me");
+          if (!res.ok) {
+            window.location.replace("/login");
+            return;
+          }
+          currentUser = await res.json();
+          if (currentUser.role !== "admin") {
+            window.location.replace("/");
+            return;
+          }
+          document.getElementById("current-user-display").textContent =
+            `Signed in as ${currentUser.username}`;
+          await loadUsers();
+        } catch {
+          window.location.replace("/login");
         }
-      } catch(_) {}
-    })();
+      }
 
-    // ── State ────────────────────────────────────────────────────────────────
-    let users = [];
-    let currentUser = null;
-    let editingUserId = null;
-    let deletingUserId = null;
-    let changingPassUserId = null;
+      async function loadUsers() {
+        const res = await fetch("/api/auth/users");
+        if (!res.ok) return;
+        users = await res.json();
+        renderUsers();
+      }
 
-    // ── Notifications ────────────────────────────────────────────────────────
-    function notify(msg, type = "success") {
-      const notif = document.getElementById("notif");
-      const item = document.createElement("div");
-      item.className = `notif-item ${type}`;
-      item.innerHTML = `<i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i> ${msg}`;
-      notif.appendChild(item);
-      setTimeout(() => item.remove(), 3000);
-    }
+      function formatDate(iso) {
+        if (!iso) return "—";
+        const d = new Date(iso);
+        return (
+          d.toLocaleDateString() +
+          " " +
+          d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        );
+      }
 
-    // ── Auth check ───────────────────────────────────────────────────────────
-    async function init() {
-      try {
-        const res = await fetch("/api/auth/me");
-        if (!res.ok) { window.location.replace("/login"); return; }
-        currentUser = await res.json();
-        if (currentUser.role !== "admin") {
-          window.location.replace("/");
+      function renderUsers() {
+        const container = document.getElementById("users-container");
+        if (!users.length) {
+          container.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i>No users found.</div>`;
           return;
         }
-        document.getElementById("current-user-display").textContent =
-          `Signed in as ${currentUser.username}`;
-        await loadUsers();
-      } catch {
-        window.location.replace("/login");
-      }
-    }
 
-    // ── Load & render users ──────────────────────────────────────────────────
-    async function loadUsers() {
-      const res = await fetch("/api/auth/users");
-      if (!res.ok) return;
-      users = await res.json();
-      renderUsers();
-    }
+        const rows = users
+          .map((u) => {
+            const isMe = u.id === currentUser.id;
+            const roleBadge = `<span class="role-badge ${u.role}">${
+              u.role === "readwrite"
+                ? "Read/Write"
+                : u.role === "readonly"
+                  ? "Read-only"
+                  : "Admin"
+            }</span>`;
+            const perms =
+              (u.permissions || [])
+                .filter((p) => p !== "admin")
+                .map((p) => `<span class="perm-tag">${p}</span>`)
+                .join("") || '<span class="text-muted">—</span>';
+            const pathMode =
+              u.pathMode ||
+              (u.allowedPaths?.includes("*") ? "all" : "allowlist");
+            const pathList =
+              pathMode === "denylist"
+                ? u.deniedPaths || []
+                : u.allowedPaths || [];
+            const paths =
+              pathMode === "all" || u.role === "admin"
+                ? `<span class="perm-tag" style="color:var(--accent)">All paths</span>`
+                : pathMode === "denylist"
+                  ? pathList.length
+                    ? `<span class="perm-tag" style="color:var(--warning)">Block: </span>` +
+                      pathList
+                        .map(
+                          (p) =>
+                            `<span class="perm-tag" title="${p}">${p.length > 24 ? "…" + p.slice(-22) : p}</span>`,
+                        )
+                        .join("")
+                    : `<span class="perm-tag" style="color:var(--warning)">All except nothing</span>`
+                  : pathList
+                      .map(
+                        (p) =>
+                          `<span class="perm-tag" title="${p}">${p.length > 24 ? "…" + p.slice(-22) : p}</span>`,
+                      )
+                      .join("") || '<span class="text-muted">No paths</span>';
 
-    function formatDate(iso) {
-      if (!iso) return "—";
-      const d = new Date(iso);
-      return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    }
-
-    function renderUsers() {
-      const container = document.getElementById("users-container");
-      if (!users.length) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i>No users found.</div>`;
-        return;
-      }
-
-      const rows = users.map(u => {
-        const isMe = u.id === currentUser.id;
-        const roleBadge = `<span class="role-badge ${u.role}">${
-          u.role === "readwrite" ? "Read/Write" :
-          u.role === "readonly"  ? "Read-only"  : "Admin"
-        }</span>`;
-        const perms = (u.permissions || []).filter(p => p !== "admin")
-          .map(p => `<span class="perm-tag">${p}</span>`).join("") || '<span class="text-muted">—</span>';
-        const pathMode = u.pathMode || (u.allowedPaths?.includes("*") ? "all" : "allowlist");
-        const pathList = pathMode === "denylist" ? (u.deniedPaths || []) : (u.allowedPaths || []);
-        const paths = pathMode === "all" || u.role === "admin"
-          ? `<span class="perm-tag" style="color:var(--accent)">All paths</span>`
-          : pathMode === "denylist"
-            ? (pathList.length
-                ? `<span class="perm-tag" style="color:var(--warning)">Block: </span>` + pathList.map(p => `<span class="perm-tag" title="${p}">${p.length > 24 ? "…" + p.slice(-22) : p}</span>`).join("")
-                : `<span class="perm-tag" style="color:var(--warning)">All except nothing</span>`)
-            : (pathList.map(p => `<span class="perm-tag" title="${p}">${p.length > 24 ? "…" + p.slice(-22) : p}</span>`).join("") || '<span class="text-muted">No paths</span>');
-
-        const actions = `
+            const actions = `
           <div class="table-actions">
             <button class="admin-action-btn" onclick="openChangePass('${u.id}')" title="Change password">
               <i class="fas fa-key"></i>
@@ -291,14 +427,18 @@
             <button class="admin-action-btn" onclick="openEdit('${u.id}')" title="Edit user">
               <i class="fas fa-pencil-alt"></i>
             </button>
-            ${!isMe ? `<button class="admin-action-btn danger" onclick="openDelete('${u.id}')" title="Delete user">
+            ${
+              !isMe
+                ? `<button class="admin-action-btn danger" onclick="openDelete('${u.id}')" title="Delete user">
               <i class="fas fa-trash"></i>
-            </button>` : `<button class="admin-action-btn" style="opacity:0.3; cursor:not-allowed" title="Cannot delete yourself" disabled>
+            </button>`
+                : `<button class="admin-action-btn" style="opacity:0.3; cursor:not-allowed" title="Cannot delete yourself" disabled>
               <i class="fas fa-trash"></i>
-            </button>`}
+            </button>`
+            }
           </div>`;
 
-        return `<tr>
+            return `<tr>
           <td>
             <span class="user-avatar">${u.username[0].toUpperCase()}</span>
             ${u.username}${isMe ? ' <span class="text-muted">(you)</span>' : ""}
@@ -309,9 +449,10 @@
           <td class="text-muted">${formatDate(u.lastLogin)}</td>
           <td>${actions}</td>
         </tr>`;
-      }).join("");
+          })
+          .join("");
 
-      container.innerHTML = `
+        container.innerHTML = `
         <table class="users-table">
           <thead>
             <tr>
@@ -325,284 +466,320 @@
           </thead>
           <tbody>${rows}</tbody>
         </table>`;
-    }
+      }
 
-    // ── Paths list helpers ───────────────────────────────────────────────────
-    function addPathEntry(value = "") {
-      const list = document.getElementById("m-paths-list");
-      const entry = document.createElement("div");
-      entry.className = "path-entry";
-      entry.innerHTML = `
+      function addPathEntry(value = "") {
+        const list = document.getElementById("m-paths-list");
+        const entry = document.createElement("div");
+        entry.className = "path-entry";
+        entry.innerHTML = `
         <input type="text" class="form-input path-input" placeholder="/home/user" value="${value}" spellcheck="false" />
         <button type="button" class="path-remove-btn" onclick="this.closest('.path-entry').remove()">
           <i class="fas fa-minus"></i>
         </button>`;
-      list.appendChild(entry);
-      entry.querySelector("input").focus();
-    }
-
-    function getPaths() {
-      return [...document.querySelectorAll(".path-input")]
-        .map(i => i.value.trim())
-        .filter(Boolean);
-    }
-
-    function getPathMode() {
-      return document.querySelector('input[name="path-mode"]:checked')?.value || "all";
-    }
-
-    // Show/hide the paths list based on mode selection
-    document.querySelectorAll('input[name="path-mode"]').forEach(radio => {
-      radio.addEventListener("change", () => {
-        const show = radio.value !== "all" && radio.checked;
-        document.getElementById("m-paths-list-wrapper").style.display = show ? "block" : "none";
-      });
-    });
-
-    // Dim terminal + path sections for admin (always full access)
-    document.getElementById("m-role").addEventListener("change", syncRoleUI);
-
-    function syncRoleUI() {
-      const isAdmin = document.getElementById("m-role").value === "admin";
-      const termSection = document.getElementById("m-terminal-section");
-      const pathSection = document.getElementById("m-paths-section");
-      termSection.style.opacity = isAdmin ? "0.4" : "1";
-      termSection.style.pointerEvents = isAdmin ? "none" : "all";
-      pathSection.style.opacity = isAdmin ? "0.4" : "1";
-      pathSection.style.pointerEvents = isAdmin ? "none" : "all";
-    }
-
-    // ── Open Add modal ───────────────────────────────────────────────────────
-    document.getElementById("add-user-btn").addEventListener("click", () => {
-      editingUserId = null;
-      document.getElementById("modal-title").textContent = "Add User";
-      document.getElementById("m-username").value = "";
-      document.getElementById("m-username").disabled = false;
-      document.getElementById("m-password").value = "";
-      document.getElementById("m-password").placeholder = "Enter password (min 8 chars)";
-      document.getElementById("m-password-hint").textContent = "";
-      document.getElementById("m-role").value = "readwrite";
-      document.getElementById("perm-execute").checked = false;
-      document.getElementById("path-mode-all").checked = true;
-      document.getElementById("m-paths-list").innerHTML = "";
-      document.getElementById("m-paths-list-wrapper").style.display = "none";
-      document.getElementById("modal-error").classList.remove("visible");
-      syncRoleUI();
-      openModal("user-modal");
-      setTimeout(() => document.getElementById("m-username").focus(), 100);
-    });
-
-    // ── Open Edit modal ──────────────────────────────────────────────────────
-    function openEdit(id) {
-      const u = users.find(u => u.id === id);
-      if (!u) return;
-      editingUserId = id;
-      document.getElementById("modal-title").textContent = `Edit — ${u.username}`;
-      document.getElementById("m-username").value = u.username;
-      document.getElementById("m-username").disabled = true;
-      document.getElementById("m-password").value = "";
-      document.getElementById("m-password").placeholder = "Leave blank to keep current";
-      document.getElementById("m-password-hint").textContent = "(optional)";
-      document.getElementById("m-role").value = u.role;
-      document.getElementById("perm-execute").checked = u.permissions?.includes("execute") || false;
-      // Restore path mode
-      const pathMode = u.pathMode || "all";
-      document.querySelector(`input[name="path-mode"][value="${pathMode}"]`).checked = true;
-      document.getElementById("m-paths-list").innerHTML = "";
-      const pathsToShow = pathMode === "denylist" ? (u.deniedPaths || []) : (u.allowedPaths || []);
-      const showPathList = pathMode !== "all";
-      document.getElementById("m-paths-list-wrapper").style.display = showPathList ? "block" : "none";
-      pathsToShow.forEach(p => addPathEntry(p));
-      document.getElementById("modal-error").classList.remove("visible");
-      syncRoleUI();
-      openModal("user-modal");
-    }
-
-    // ── Open Delete modal ────────────────────────────────────────────────────
-    function openDelete(id) {
-      const u = users.find(u => u.id === id);
-      if (!u) return;
-      deletingUserId = id;
-      document.getElementById("delete-confirm-text").innerHTML =
-        `Are you sure you want to delete <strong>${u.username}</strong>?<br><br>
-        This action cannot be undone. The user will immediately lose all access.`;
-      openModal("delete-modal");
-    }
-
-    // ── Open Change Password modal ───────────────────────────────────────────
-    function openChangePass(id) {
-      changingPassUserId = id;
-      document.getElementById("new-pass").value = "";
-      document.getElementById("new-pass-confirm").value = "";
-      document.getElementById("passwd-error").classList.remove("visible");
-      openModal("passwd-modal");
-      setTimeout(() => document.getElementById("new-pass").focus(), 100);
-    }
-
-    // ── Modal helpers ────────────────────────────────────────────────────────
-    function openModal(id) {
-      document.getElementById(id).classList.add("open");
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove("open");
-    }
-
-    ["modal-close", "modal-cancel"].forEach(id =>
-      document.getElementById(id).addEventListener("click", () => closeModal("user-modal"))
-    );
-    ["delete-modal-close", "delete-cancel"].forEach(id =>
-      document.getElementById(id).addEventListener("click", () => closeModal("delete-modal"))
-    );
-    ["passwd-modal-close", "passwd-cancel"].forEach(id =>
-      document.getElementById(id).addEventListener("click", () => closeModal("passwd-modal"))
-    );
-
-    // Close on overlay click
-    ["user-modal", "delete-modal", "passwd-modal"].forEach(id => {
-      document.getElementById(id).addEventListener("click", e => {
-        if (e.target === e.currentTarget) closeModal(id);
-      });
-    });
-
-    document.getElementById("add-path-btn").addEventListener("click", () => addPathEntry());
-
-    // Toggle password visibility
-    document.getElementById("m-toggle-pass").addEventListener("click", () => {
-      const inp = document.getElementById("m-password");
-      inp.type = inp.type === "password" ? "text" : "password";
-      document.getElementById("m-toggle-pass").querySelector("i").className =
-        inp.type === "password" ? "fas fa-eye" : "fas fa-eye-slash";
-    });
-
-    // ── Save user ────────────────────────────────────────────────────────────
-    document.getElementById("modal-save").addEventListener("click", async () => {
-      const errorBox = document.getElementById("modal-error");
-      const errorText = document.getElementById("modal-error-text");
-      const showErr = (msg) => { errorText.textContent = msg; errorBox.classList.add("visible"); };
-      errorBox.classList.remove("visible");
-
-      const username = document.getElementById("m-username").value.trim();
-      const password = document.getElementById("m-password").value;
-      const role = document.getElementById("m-role").value;
-      const terminalAccess = document.getElementById("perm-execute").checked;
-      const pathMode = getPathMode();
-      const paths = getPaths();
-
-      if (!editingUserId && (!username || username.length < 2)) {
-        return showErr("Username must be at least 2 characters.");
-      }
-      if (!editingUserId && (!password || password.length < 8)) {
-        return showErr("Password must be at least 8 characters.");
-      }
-      if (editingUserId && password && password.length < 8) {
-        return showErr("New password must be at least 8 characters.");
+        list.appendChild(entry);
+        entry.querySelector("input").focus();
       }
 
-      const saveBtn = document.getElementById("modal-save");
-      saveBtn.disabled = true;
-      saveBtn.textContent = "Saving…";
-
-      try {
-        let res;
-        if (editingUserId) {
-          const body = { role, terminalAccess, pathMode,
-            allowedPaths: pathMode === "allowlist" ? paths : [],
-            deniedPaths:  pathMode === "denylist"  ? paths : [] };
-          if (password) body.password = password;
-          res = await fetch(`/api/auth/users/${editingUserId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          });
-        } else {
-          res = await fetch("/api/auth/users", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password, role, terminalAccess, pathMode,
-              allowedPaths: pathMode === "allowlist" ? paths : [],
-              deniedPaths:  pathMode === "denylist"  ? paths : [] }),
-          });
-        }
-
-        const data = await res.json();
-        if (res.ok) {
-          closeModal("user-modal");
-          notify(editingUserId ? "User updated." : "User created.");
-          await loadUsers();
-        } else {
-          showErr(data.error || "Failed to save user.");
-        }
-      } catch {
-        showErr("Connection error.");
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Save";
+      function getPaths() {
+        return [...document.querySelectorAll(".path-input")]
+          .map((i) => i.value.trim())
+          .filter(Boolean);
       }
-    });
 
-    // ── Confirm delete ───────────────────────────────────────────────────────
-    document.getElementById("delete-confirm").addEventListener("click", async () => {
-      if (!deletingUserId) return;
-      const btn = document.getElementById("delete-confirm");
-      btn.disabled = true;
-      btn.textContent = "Deleting…";
-      try {
-        const res = await fetch(`/api/auth/users/${deletingUserId}`, { method: "DELETE" });
-        const data = await res.json();
-        if (res.ok) {
-          closeModal("delete-modal");
-          notify("User deleted.", "success");
-          await loadUsers();
-        } else {
-          notify(data.error || "Delete failed.", "error");
-        }
-      } catch {
-        notify("Connection error.", "error");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Delete";
-        deletingUserId = null;
+      function getPathMode() {
+        return (
+          document.querySelector('input[name="path-mode"]:checked')?.value ||
+          "all"
+        );
       }
-    });
 
-    // ── Save new password (admin changing another user's password) ───────────
-    document.getElementById("passwd-save").addEventListener("click", async () => {
-      const newPass = document.getElementById("new-pass").value;
-      const newPassConfirm = document.getElementById("new-pass-confirm").value;
-      const errBox = document.getElementById("passwd-error");
-      const errText = document.getElementById("passwd-error-text");
-      const showErr = (msg) => { errText.textContent = msg; errBox.classList.add("visible"); };
-      errBox.classList.remove("visible");
-
-      if (!newPass || newPass.length < 8) return showErr("Password must be at least 8 characters.");
-      if (newPass !== newPassConfirm) return showErr("Passwords do not match.");
-
-      const btn = document.getElementById("passwd-save");
-      btn.disabled = true;
-      btn.textContent = "Updating…";
-
-      try {
-        const res = await fetch(`/api/auth/users/${changingPassUserId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: newPass }),
+      document.querySelectorAll('input[name="path-mode"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+          const show = radio.value !== "all" && radio.checked;
+          document.getElementById("m-paths-list-wrapper").style.display = show
+            ? "block"
+            : "none";
         });
-        const data = await res.json();
-        if (res.ok) {
-          closeModal("passwd-modal");
-          notify("Password updated.");
-        } else {
-          showErr(data.error || "Failed to update password.");
-        }
-      } catch {
-        showErr("Connection error.");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Update Password";
-      }
-    });
+      });
 
-    init();
+      document.getElementById("m-role").addEventListener("change", syncRoleUI);
+
+      function syncRoleUI() {
+        const isAdmin = document.getElementById("m-role").value === "admin";
+        const termSection = document.getElementById("m-terminal-section");
+        const pathSection = document.getElementById("m-paths-section");
+        termSection.style.opacity = isAdmin ? "0.4" : "1";
+        termSection.style.pointerEvents = isAdmin ? "none" : "all";
+        pathSection.style.opacity = isAdmin ? "0.4" : "1";
+        pathSection.style.pointerEvents = isAdmin ? "none" : "all";
+      }
+
+      document.getElementById("add-user-btn").addEventListener("click", () => {
+        editingUserId = null;
+        document.getElementById("modal-title").textContent = "Add User";
+        document.getElementById("m-username").value = "";
+        document.getElementById("m-username").disabled = false;
+        document.getElementById("m-password").value = "";
+        document.getElementById("m-password").placeholder =
+          "Enter password (min 8 chars)";
+        document.getElementById("m-password-hint").textContent = "";
+        document.getElementById("m-role").value = "readwrite";
+        document.getElementById("perm-execute").checked = false;
+        document.getElementById("path-mode-all").checked = true;
+        document.getElementById("m-paths-list").innerHTML = "";
+        document.getElementById("m-paths-list-wrapper").style.display = "none";
+        document.getElementById("modal-error").classList.remove("visible");
+        syncRoleUI();
+        openModal("user-modal");
+        setTimeout(() => document.getElementById("m-username").focus(), 100);
+      });
+
+      function openEdit(id) {
+        const u = users.find((u) => u.id === id);
+        if (!u) return;
+        editingUserId = id;
+        document.getElementById("modal-title").textContent =
+          `Edit — ${u.username}`;
+        document.getElementById("m-username").value = u.username;
+        document.getElementById("m-username").disabled = true;
+        document.getElementById("m-password").value = "";
+        document.getElementById("m-password").placeholder =
+          "Leave blank to keep current";
+        document.getElementById("m-password-hint").textContent = "(optional)";
+        document.getElementById("m-role").value = u.role;
+        document.getElementById("perm-execute").checked =
+          u.permissions?.includes("execute") || false;
+
+        const pathMode = u.pathMode || "all";
+        document.querySelector(
+          `input[name="path-mode"][value="${pathMode}"]`,
+        ).checked = true;
+        document.getElementById("m-paths-list").innerHTML = "";
+        const pathsToShow =
+          pathMode === "denylist" ? u.deniedPaths || [] : u.allowedPaths || [];
+        const showPathList = pathMode !== "all";
+        document.getElementById("m-paths-list-wrapper").style.display =
+          showPathList ? "block" : "none";
+        pathsToShow.forEach((p) => addPathEntry(p));
+        document.getElementById("modal-error").classList.remove("visible");
+        syncRoleUI();
+        openModal("user-modal");
+      }
+
+      function openDelete(id) {
+        const u = users.find((u) => u.id === id);
+        if (!u) return;
+        deletingUserId = id;
+        document.getElementById("delete-confirm-text").innerHTML =
+          `Are you sure you want to delete <strong>${u.username}</strong>?<br><br>
+        This action cannot be undone. The user will immediately lose all access.`;
+        openModal("delete-modal");
+      }
+
+      function openChangePass(id) {
+        changingPassUserId = id;
+        document.getElementById("new-pass").value = "";
+        document.getElementById("new-pass-confirm").value = "";
+        document.getElementById("passwd-error").classList.remove("visible");
+        openModal("passwd-modal");
+        setTimeout(() => document.getElementById("new-pass").focus(), 100);
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add("open");
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+      }
+
+      ["modal-close", "modal-cancel"].forEach((id) =>
+        document
+          .getElementById(id)
+          .addEventListener("click", () => closeModal("user-modal")),
+      );
+      ["delete-modal-close", "delete-cancel"].forEach((id) =>
+        document
+          .getElementById(id)
+          .addEventListener("click", () => closeModal("delete-modal")),
+      );
+      ["passwd-modal-close", "passwd-cancel"].forEach((id) =>
+        document
+          .getElementById(id)
+          .addEventListener("click", () => closeModal("passwd-modal")),
+      );
+
+      ["user-modal", "delete-modal", "passwd-modal"].forEach((id) => {
+        document.getElementById(id).addEventListener("click", (e) => {
+          if (e.target === e.currentTarget) closeModal(id);
+        });
+      });
+
+      document
+        .getElementById("add-path-btn")
+        .addEventListener("click", () => addPathEntry());
+
+      document.getElementById("m-toggle-pass").addEventListener("click", () => {
+        const inp = document.getElementById("m-password");
+        inp.type = inp.type === "password" ? "text" : "password";
+        document.getElementById("m-toggle-pass").querySelector("i").className =
+          inp.type === "password" ? "fas fa-eye" : "fas fa-eye-slash";
+      });
+
+      document
+        .getElementById("modal-save")
+        .addEventListener("click", async () => {
+          const errorBox = document.getElementById("modal-error");
+          const errorText = document.getElementById("modal-error-text");
+          const showErr = (msg) => {
+            errorText.textContent = msg;
+            errorBox.classList.add("visible");
+          };
+          errorBox.classList.remove("visible");
+
+          const username = document.getElementById("m-username").value.trim();
+          const password = document.getElementById("m-password").value;
+          const role = document.getElementById("m-role").value;
+          const terminalAccess =
+            document.getElementById("perm-execute").checked;
+          const pathMode = getPathMode();
+          const paths = getPaths();
+
+          if (!editingUserId && (!username || username.length < 2)) {
+            return showErr("Username must be at least 2 characters.");
+          }
+          if (!editingUserId && (!password || password.length < 8)) {
+            return showErr("Password must be at least 8 characters.");
+          }
+          if (editingUserId && password && password.length < 8) {
+            return showErr("New password must be at least 8 characters.");
+          }
+
+          const saveBtn = document.getElementById("modal-save");
+          saveBtn.disabled = true;
+          saveBtn.textContent = "Saving…";
+
+          try {
+            let res;
+            if (editingUserId) {
+              const body = {
+                role,
+                terminalAccess,
+                pathMode,
+                allowedPaths: pathMode === "allowlist" ? paths : [],
+                deniedPaths: pathMode === "denylist" ? paths : [],
+              };
+              if (password) body.password = password;
+              res = await fetch(`/api/auth/users/${editingUserId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+              });
+            } else {
+              res = await fetch("/api/auth/users", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  username,
+                  password,
+                  role,
+                  terminalAccess,
+                  pathMode,
+                  allowedPaths: pathMode === "allowlist" ? paths : [],
+                  deniedPaths: pathMode === "denylist" ? paths : [],
+                }),
+              });
+            }
+
+            const data = await res.json();
+            if (res.ok) {
+              closeModal("user-modal");
+              notify(editingUserId ? "User updated." : "User created.");
+              await loadUsers();
+            } else {
+              showErr(data.error || "Failed to save user.");
+            }
+          } catch {
+            showErr("Connection error.");
+          } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = "Save";
+          }
+        });
+
+      document
+        .getElementById("delete-confirm")
+        .addEventListener("click", async () => {
+          if (!deletingUserId) return;
+          const btn = document.getElementById("delete-confirm");
+          btn.disabled = true;
+          btn.textContent = "Deleting…";
+          try {
+            const res = await fetch(`/api/auth/users/${deletingUserId}`, {
+              method: "DELETE",
+            });
+            const data = await res.json();
+            if (res.ok) {
+              closeModal("delete-modal");
+              notify("User deleted.", "success");
+              await loadUsers();
+            } else {
+              notify(data.error || "Delete failed.", "error");
+            }
+          } catch {
+            notify("Connection error.", "error");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Delete";
+            deletingUserId = null;
+          }
+        });
+
+      document
+        .getElementById("passwd-save")
+        .addEventListener("click", async () => {
+          const newPass = document.getElementById("new-pass").value;
+          const newPassConfirm =
+            document.getElementById("new-pass-confirm").value;
+          const errBox = document.getElementById("passwd-error");
+          const errText = document.getElementById("passwd-error-text");
+          const showErr = (msg) => {
+            errText.textContent = msg;
+            errBox.classList.add("visible");
+          };
+          errBox.classList.remove("visible");
+
+          if (!newPass || newPass.length < 8)
+            return showErr("Password must be at least 8 characters.");
+          if (newPass !== newPassConfirm)
+            return showErr("Passwords do not match.");
+
+          const btn = document.getElementById("passwd-save");
+          btn.disabled = true;
+          btn.textContent = "Updating…";
+
+          try {
+            const res = await fetch(`/api/auth/users/${changingPassUserId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ password: newPass }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              closeModal("passwd-modal");
+              notify("Password updated.");
+            } else {
+              showErr(data.error || "Failed to update password.");
+            }
+          } catch {
+            showErr("Connection error.");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Update Password";
+          }
+        });
+
+      init();
     </script>
   </body>
 </html>

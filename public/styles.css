@@ -68,8 +68,6 @@
   display: none !important;
 }
 
-/* ─── BACKGROUND ─── */
-
 #specters-bg {
   position: fixed;
   inset: -20vh;
@@ -88,9 +86,8 @@
   transition: background 1s ease;
 }
 
-/* ─── BASE ─── */
-
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   background: #000;
@@ -101,7 +98,8 @@ html, body {
 
 body {
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 13px;
   line-height: 1.5;
 }
@@ -113,8 +111,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-/* ─── BUTTONS ─── */
 
 .btn,
 .nav-btn,
@@ -201,8 +197,6 @@ button:hover {
   background: rgba(255, 83, 112, 0.2) !important;
 }
 
-/* ─── INPUTS ─── */
-
 input,
 textarea,
 select {
@@ -224,8 +218,6 @@ select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(var(--accent-color), 0.1);
 }
-
-/* ─── HEADER / TOOLBAR ─── */
 
 .header {
   background: rgba(0, 0, 0, 0.25);
@@ -269,8 +261,6 @@ select:focus {
   justify-content: center;
   font-size: 13px;
 }
-
-/* ─── USER MENU ─── */
 
 #user-menu-wrapper {
   display: flex;
@@ -335,8 +325,6 @@ select:focus {
   margin: 4px 8px;
 }
 
-/* ─── PATH BAR ─── */
-
 .path-bar {
   flex: 1 1 auto;
   display: flex;
@@ -376,8 +364,6 @@ select:focus {
   background: rgba(var(--accent-color), 0.2);
   color: var(--text-primary);
 }
-
-/* ─── SORT CONTROLS ─── */
 
 .toolbar .topbar-sort-controls {
   margin-left: auto;
@@ -426,8 +412,6 @@ select:focus {
   }
 }
 
-/* ─── MAIN CONTENT ─── */
-
 .main-content {
   flex: 1;
   display: flex;
@@ -443,8 +427,6 @@ select:focus {
   overflow: hidden;
   min-height: 0;
 }
-
-/* ─── FILE LIST ─── */
 
 .file-list-container {
   background: var(--glass-bg);
@@ -465,8 +447,14 @@ select:focus {
 }
 
 @keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.99); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .file-list-header {
@@ -525,11 +513,11 @@ select:focus {
 }
 
 .column-header.sort-active .sort-indicator::after {
-  content: '\2193';
+  content: "\2193";
 }
 
 .column-header.sort-active.sort-desc .sort-indicator::after {
-  content: '\2191';
+  content: "\2191";
 }
 
 .file-list {
@@ -611,8 +599,6 @@ select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* ─── SORT DROPDOWN ─── */
 
 .sort-controls {
   display: flex;
@@ -724,8 +710,6 @@ select:focus {
   color: var(--text-accent);
 }
 
-/* ─── SETTINGS DROPDOWN ─── */
-
 .settings-dropdown {
   min-width: auto;
 }
@@ -743,6 +727,7 @@ select:focus {
   right: 0;
   min-width: 280px;
   width: 280px;
+  max-height: none;
 }
 
 .settings-row {
@@ -801,33 +786,6 @@ select:focus {
   flex: 1;
 }
 
-.accent-color-presets {
-  display: flex;
-  gap: 6px;
-  margin-top: 4px;
-  padding: 0 6px;
-  flex-wrap: wrap;
-}
-
-.accent-preset {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: var(--transition-fast);
-  padding: 0;
-}
-
-.accent-preset:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.accent-preset.active {
-  border-color: white;
-  box-shadow: 0 0 8px rgba(var(--accent-color), 0.5);
-}
-
 .sort-order-btn {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -847,8 +805,6 @@ select:focus {
   background: rgba(var(--accent-color), 0.1);
   color: var(--text-primary);
 }
-
-/* ─── TERMINAL ─── */
 
 .terminal-container-wrapper {
   height: 300px;
@@ -911,8 +867,6 @@ select:focus {
   flex-shrink: 0;
 }
 
-/* ─── SYSTEM STATS / POWER MONITOR ─── */
-
 .system-stats {
   display: flex;
   gap: 6px;
@@ -950,7 +904,8 @@ select:focus {
 }
 
 .stat-item span {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-weight: 600;
   min-width: 20px;
   text-align: right;
@@ -958,7 +913,8 @@ select:focus {
 }
 
 .stat-item .stat-label {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-weight: 400;
   color: var(--text-tertiary);
   font-size: 9px;
@@ -966,29 +922,60 @@ select:focus {
   letter-spacing: 0.3px;
 }
 
-/* Stat colors */
-#cpu-stat i { color: #64b5f6; }
-#memory-stat i { color: #81c784; }
-#gpu-stat i { color: #ffb74d; }
-#network-stat i { color: #4dd0e1; }
-#uptime-stat i { color: #a5d6a7; }
-#temp-stat i { color: #ef9a9a; }
-#battery-stat i { color: #fff176; }
-#wattage-stat i { color: #ffcc80; }
-#net-down-stat i { color: #80cbc4; }
-#net-up-stat i { color: #90caf9; }
-
-.stat-item.stat-low i { color: #81c784; }
-.stat-item.stat-med i { color: #ffb74d; }
-.stat-item.stat-high i { color: #ef5350; }
-.stat-item.stat-critical i { color: #ff1744; animation: statPulse 1s ease-in-out infinite; }
-
-@keyframes statPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+#cpu-stat i {
+  color: #64b5f6;
+}
+#memory-stat i {
+  color: #81c784;
+}
+#gpu-stat i {
+  color: #ffb74d;
+}
+#network-stat i {
+  color: #4dd0e1;
+}
+#uptime-stat i {
+  color: #a5d6a7;
+}
+#temp-stat i {
+  color: #ef9a9a;
+}
+#battery-stat i {
+  color: #fff176;
+}
+#wattage-stat i {
+  color: #ffcc80;
+}
+#net-down-stat i {
+  color: #80cbc4;
+}
+#net-up-stat i {
+  color: #90caf9;
 }
 
-/* ─── TERMINAL CONTROLS ─── */
+.stat-item.stat-low i {
+  color: #81c784;
+}
+.stat-item.stat-med i {
+  color: #ffb74d;
+}
+.stat-item.stat-high i {
+  color: #ef5350;
+}
+.stat-item.stat-critical i {
+  color: #ff1744;
+  animation: statPulse 1s ease-in-out infinite;
+}
+
+@keyframes statPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
 
 .terminal-controls {
   display: flex;
@@ -1072,7 +1059,8 @@ select:focus {
   flex: 1;
   background: rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
@@ -1106,8 +1094,6 @@ select:focus {
   transition: transform 0.3s ease;
 }
 
-/* ─── DRAG & DROP ─── */
-
 .drop-zone {
   position: absolute;
   top: 0;
@@ -1131,8 +1117,13 @@ select:focus {
 }
 
 @keyframes dropPulse {
-  0%, 100% { border-color: rgba(var(--accent-color), 0.2); }
-  50% { border-color: rgba(var(--accent-color), 0.5); }
+  0%,
+  100% {
+    border-color: rgba(var(--accent-color), 0.2);
+  }
+  50% {
+    border-color: rgba(var(--accent-color), 0.5);
+  }
 }
 
 .drop-message {
@@ -1148,16 +1139,19 @@ select:focus {
 }
 
 @keyframes floatIcon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 .drop-message p {
   font-size: 16px;
   font-weight: 500;
 }
-
-/* ─── CONTEXT MENU ─── */
 
 .context-menu {
   position: fixed;
@@ -1175,8 +1169,14 @@ select:focus {
 }
 
 @keyframes contextPop {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .context-menu.hidden {
@@ -1213,8 +1213,6 @@ select:focus {
   cursor: default;
 }
 
-/* ─── MODALS ─── */
-
 .modal {
   position: fixed;
   top: 0;
@@ -1232,8 +1230,12 @@ select:focus {
 }
 
 @keyframes modalBgIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal.hidden {
@@ -1259,8 +1261,14 @@ select:focus {
 }
 
 @keyframes modalSlideIn {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-header {
@@ -1325,8 +1333,6 @@ select:focus {
   justify-content: flex-end;
 }
 
-/* ─── EDITOR ─── */
-
 .modal-large {
   max-width: 90vw;
   max-height: 90vh;
@@ -1339,7 +1345,8 @@ select:focus {
   height: 400px;
   border-radius: var(--radius-md);
   padding: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 14px;
   resize: none;
   outline: none;
@@ -1352,8 +1359,6 @@ select:focus {
   border-color: rgba(var(--accent-color), 0.3);
   box-shadow: 0 0 0 3px rgba(var(--accent-color), 0.08);
 }
-
-/* ─── PREVIEW ─── */
 
 #preview-content {
   width: 100%;
@@ -1389,7 +1394,8 @@ select:focus {
 .preview-text,
 .preview-code {
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 13px;
   line-height: 1.6;
   color: var(--text-primary);
@@ -1421,8 +1427,6 @@ select:focus {
 .preview-file-info {
   display: none;
 }
-
-/* ─── NOTIFICATIONS ─── */
 
 .notifications {
   position: fixed;
@@ -1462,8 +1466,14 @@ select:focus {
 }
 
 @keyframes notifSlide {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .notification-close {
@@ -1489,18 +1499,20 @@ select:focus {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* ─── MODE POP ─── */
-
 .mode-pop {
   animation: mode-pop-in 200ms ease-out;
 }
 
 @keyframes mode-pop-in {
-  0% { opacity: 0; transform: scale(0.98); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-
-/* ─── UPLOAD PROGRESS ─── */
 
 .upload-progress {
   position: fixed;
@@ -1586,7 +1598,11 @@ select:focus {
 
 .upload-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, rgba(var(--accent-color), 0.8), rgba(var(--accent-color), 0.5));
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-color), 0.8),
+    rgba(var(--accent-color), 0.5)
+  );
   border-radius: 4px;
   transition: width 0.3s ease;
   width: 0%;
@@ -1602,8 +1618,6 @@ select:focus {
   min-width: 35px;
   text-align: right;
 }
-
-/* ─── LOADING ─── */
 
 .loading {
   position: fixed;
@@ -1635,17 +1649,17 @@ select:focus {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
-
-/* ─── SCROLLBAR ─── */
 
 ::-webkit-scrollbar {
   display: none;
 }
-
-/* ─── LAYOUT MODES ─── */
 
 [data-layout="split"] .main-content {
   display: flex;
@@ -1690,34 +1704,48 @@ select:focus {
   overflow: hidden;
 }
 
-/* Floating terminal edge resize handles */
 [data-layout="floating"] .terminal-container-wrapper .resize-edge {
   position: absolute;
   z-index: 2;
 }
 
 [data-layout="floating"] .terminal-container-wrapper .resize-edge.edge-s {
-  bottom: 0; left: 10px; right: 10px; height: 6px;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  height: 6px;
   cursor: ns-resize;
 }
 
 [data-layout="floating"] .terminal-container-wrapper .resize-edge.edge-e {
-  right: 0; top: 10px; bottom: 10px; width: 6px;
+  right: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 6px;
   cursor: ew-resize;
 }
 
 [data-layout="floating"] .terminal-container-wrapper .resize-edge.edge-w {
-  left: 0; top: 10px; bottom: 10px; width: 6px;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 6px;
   cursor: ew-resize;
 }
 
 [data-layout="floating"] .terminal-container-wrapper .resize-edge.edge-sw {
-  bottom: 0; left: 0; width: 10px; height: 10px;
+  bottom: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
   cursor: nesw-resize;
 }
 
 [data-layout="floating"] .terminal-container-wrapper .resize-edge.edge-se {
-  bottom: 0; right: 0; width: 10px; height: 10px;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
   cursor: nwse-resize;
 }
 
@@ -1755,8 +1783,6 @@ select:focus {
   height: auto !important;
   border-radius: var(--radius-lg) !important;
 }
-
-/* ─── SNAP ZONES ─── */
 
 .snap-zone {
   position: fixed;
@@ -1809,7 +1835,6 @@ select:focus {
   bottom: 10px;
 }
 
-/* Pop-out button on panel headers */
 .panel-popout-btn {
   background: none;
   border: none;
@@ -1851,8 +1876,6 @@ select:focus {
   color: var(--text-primary);
   background: rgba(255, 255, 255, 0.08);
 }
-
-/* ─── FILE LIST STYLES ─── */
 
 [data-file-style="compact"] .file-item {
   padding: 5px 28px;

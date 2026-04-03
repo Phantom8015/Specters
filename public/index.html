@@ -18,9 +18,38 @@
   </head>
   <body>
     <div class="mobile-gate">View this page on Desktop</div>
-    <div id="loading-screen" style="position:fixed;inset:0;z-index:999999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 0.4s ease">
-      <div style="width:200px;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">
-        <div id="loading-bar" style="width:0%;height:100%;border-radius:2px;background:rgba(var(--accent-color,100,160,255),0.8);transition:width 0.3s ease"></div>
+    <div
+      id="loading-screen"
+      style="
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.4s ease;
+      "
+    >
+      <div
+        style="
+          width: 200px;
+          height: 3px;
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 2px;
+          overflow: hidden;
+        "
+      >
+        <div
+          id="loading-bar"
+          style="
+            width: 0%;
+            height: 100%;
+            border-radius: 2px;
+            background: rgba(var(--accent-color, 100, 160, 255), 0.8);
+            transition: width 0.3s ease;
+          "
+        ></div>
       </div>
     </div>
     <div id="specters-bg"></div>
@@ -115,18 +144,16 @@
                   id="accent-color-input"
                   type="color"
                   value="#64a0ff"
-                  style="width:32px;height:32px;padding:2px;border-radius:50%;cursor:pointer;background:transparent;border:2px solid rgba(255,255,255,0.15)"
+                  style="
+                    width: 32px;
+                    height: 32px;
+                    padding: 2px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    background: transparent;
+                    border: 2px solid rgba(255, 255, 255, 0.15);
+                  "
                 />
-              </div>
-              <div class="accent-color-presets" id="accent-presets">
-                <button class="accent-preset" data-color="100,160,255" style="background:#64a0ff" title="Blue"></button>
-                <button class="accent-preset" data-color="168,85,247" style="background:#a855f7" title="Purple"></button>
-                <button class="accent-preset" data-color="236,72,153" style="background:#ec4899" title="Pink"></button>
-                <button class="accent-preset" data-color="239,68,68" style="background:#ef4444" title="Red"></button>
-                <button class="accent-preset" data-color="245,158,11" style="background:#f59e0b" title="Amber"></button>
-                <button class="accent-preset" data-color="34,197,94" style="background:#22c55e" title="Green"></button>
-                <button class="accent-preset" data-color="6,182,212" style="background:#06b6d4" title="Cyan"></button>
-                <button class="accent-preset" data-color="255,255,255" style="background:#ffffff" title="White"></button>
               </div>
             </div>
           </div>
@@ -136,15 +163,17 @@
               class="custom-sort-dropdown user-dropdown"
               id="user-dropdown-wrapper"
             >
-              <button
-                id="user-menu-btn"
-                class="toolbar-btn"
-                title="Account"
-              >
+              <button id="user-menu-btn" class="toolbar-btn" title="Account">
                 <i class="fas fa-user-circle"></i>
               </button>
-              <div class="custom-sort-menu user-dropdown-menu" id="user-dropdown-menu">
-                <div class="custom-sort-item user-menu-heading" id="user-display-name"></div>
+              <div
+                class="custom-sort-menu user-dropdown-menu"
+                id="user-dropdown-menu"
+              >
+                <div
+                  class="custom-sort-item user-menu-heading"
+                  id="user-display-name"
+                ></div>
                 <div class="menu-separator"></div>
                 <a
                   class="custom-sort-item user-dropdown-link hidden"
@@ -153,7 +182,10 @@
                 >
                   <i class="fas fa-users-cog"></i>Admin Panel
                 </a>
-                <div class="custom-sort-item user-dropdown-link" id="change-password-item">
+                <div
+                  class="custom-sort-item user-dropdown-link"
+                  id="change-password-item"
+                >
                   <i class="fas fa-key"></i>Change Password
                 </div>
                 <div
@@ -165,17 +197,25 @@
               </div>
             </div>
           </div>
-
         </div>
       </header>
 
       <div class="main-content">
         <div class="file-explorer">
           <div class="file-list-container">
-          <div class="file-list-header" id="file-list-header">
-              <div class="file-list-title column-header sortable" data-sort="name">Files<span class="sort-indicator"></span></div>
-              <div class="column-header sortable" data-sort="size">Size<span class="sort-indicator"></span></div>
-              <div class="column-header sortable" data-sort="date">Date Modified<span class="sort-indicator"></span></div>
+            <div class="file-list-header" id="file-list-header">
+              <div
+                class="file-list-title column-header sortable"
+                data-sort="name"
+              >
+                Files<span class="sort-indicator"></span>
+              </div>
+              <div class="column-header sortable" data-sort="size">
+                Size<span class="sort-indicator"></span>
+              </div>
+              <div class="column-header sortable" data-sort="date">
+                Date Modified<span class="sort-indicator"></span>
+              </div>
               <div class="column-header">Permissions</div>
             </div>
 
@@ -203,7 +243,8 @@
               </div>
               <div class="stat-item" id="memory-stat">
                 <i class="fas fa-memory"></i>
-                <span id="memory-usage">--</span><span class="stat-unit">%</span>
+                <span id="memory-usage">--</span
+                ><span class="stat-unit">%</span>
               </div>
               <div class="stat-item" id="gpu-stat" style="display: none">
                 <i class="fas fa-tv"></i>
@@ -211,11 +252,13 @@
               </div>
               <div class="stat-item" id="temp-stat" style="display: none">
                 <i class="fas fa-temperature-half"></i>
-                <span id="cpu-temp">--</span><span class="stat-unit">&deg;C</span>
+                <span id="cpu-temp">--</span
+                ><span class="stat-unit">&deg;C</span>
               </div>
               <div class="stat-item" id="battery-stat" style="display: none">
                 <i class="fas fa-battery-full"></i>
-                <span id="battery-percent">--</span><span class="stat-unit">%</span>
+                <span id="battery-percent">--</span
+                ><span class="stat-unit">%</span>
               </div>
               <div class="stat-item" id="network-stat" style="display: none">
                 <i class="fas fa-network-wired"></i>
@@ -244,7 +287,11 @@
                   <i class="fas fa-plus"></i>
                 </button>
               </div>
-              <button id="terminal-popout-btn" class="panel-popout-btn" title="Pop out terminal">
+              <button
+                id="terminal-popout-btn"
+                class="panel-popout-btn"
+                title="Pop out terminal"
+              >
                 <i class="fas fa-up-right-from-square"></i>
               </button>
             </div>
@@ -286,7 +333,6 @@
           <i class="fas fa-info-circle"></i> Properties
         </div>
       </div>
-
 
       <div id="editor-modal" class="modal hidden">
         <div class="modal-content">
@@ -389,193 +435,317 @@
     <script src="script.js"></script>
 
     <div id="change-password-modal" class="modal hidden">
-      <div class="modal-content" style="max-width:380px">
+      <div class="modal-content" style="max-width: 380px">
         <div class="modal-header">
           <h3>Change Password</h3>
           <button class="modal-close">&times;</button>
         </div>
-        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+        <div
+          class="modal-body"
+          style="display: flex; flex-direction: column; gap: 12px"
+        >
           <div>
-            <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">Current Password</label>
-            <input type="password" id="cp-current" class="path-input" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:7px 10px;color:var(--text-primary);font-size:13px;outline:none;user-select:text;-webkit-user-select:text" placeholder="Current password" />
+            <label
+              style="
+                font-size: 12px;
+                color: var(--text-secondary);
+                display: block;
+                margin-bottom: 4px;
+              "
+              >Current Password</label
+            >
+            <input
+              type="password"
+              id="cp-current"
+              class="path-input"
+              style="
+                width: 100%;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 4px;
+                padding: 7px 10px;
+                color: var(--text-primary);
+                font-size: 13px;
+                outline: none;
+                user-select: text;
+                -webkit-user-select: text;
+              "
+              placeholder="Current password"
+            />
           </div>
           <div>
-            <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">New Password</label>
-            <input type="password" id="cp-new" class="path-input" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:7px 10px;color:var(--text-primary);font-size:13px;outline:none;user-select:text;-webkit-user-select:text" placeholder="Min 8 characters" />
+            <label
+              style="
+                font-size: 12px;
+                color: var(--text-secondary);
+                display: block;
+                margin-bottom: 4px;
+              "
+              >New Password</label
+            >
+            <input
+              type="password"
+              id="cp-new"
+              class="path-input"
+              style="
+                width: 100%;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 4px;
+                padding: 7px 10px;
+                color: var(--text-primary);
+                font-size: 13px;
+                outline: none;
+                user-select: text;
+                -webkit-user-select: text;
+              "
+              placeholder="Min 8 characters"
+            />
           </div>
           <div>
-            <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">Confirm New Password</label>
-            <input type="password" id="cp-confirm" class="path-input" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:7px 10px;color:var(--text-primary);font-size:13px;outline:none;user-select:text;-webkit-user-select:text" placeholder="Repeat new password" />
+            <label
+              style="
+                font-size: 12px;
+                color: var(--text-secondary);
+                display: block;
+                margin-bottom: 4px;
+              "
+              >Confirm New Password</label
+            >
+            <input
+              type="password"
+              id="cp-confirm"
+              class="path-input"
+              style="
+                width: 100%;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 4px;
+                padding: 7px 10px;
+                color: var(--text-primary);
+                font-size: 13px;
+                outline: none;
+                user-select: text;
+                -webkit-user-select: text;
+              "
+              placeholder="Repeat new password"
+            />
           </div>
-          <div id="cp-error" style="display:none;padding:8px 10px;background:rgba(255,83,112,0.1);border:1px solid rgba(255,83,112,0.3);border-radius:4px;font-size:12px;color:#ff5370"></div>
+          <div
+            id="cp-error"
+            style="
+              display: none;
+              padding: 8px 10px;
+              background: rgba(255, 83, 112, 0.1);
+              border: 1px solid rgba(255, 83, 112, 0.3);
+              border-radius: 4px;
+              font-size: 12px;
+              color: #ff5370;
+            "
+          ></div>
         </div>
         <div class="modal-footer">
-          <button id="cp-save-btn" class="btn btn-primary">Update Password</button>
+          <button id="cp-save-btn" class="btn btn-primary">
+            Update Password
+          </button>
           <button class="btn btn-secondary modal-close">Cancel</button>
         </div>
       </div>
     </div>
 
     <script>
-    (function () {
-      const _fetch = window.fetch;
-      window.fetch = function (...args) {
-        return _fetch.apply(this, args).then((res) => {
-          if (res.status === 401 && !args[0].toString().includes("/api/auth/")) {
-            window.location.replace("/login");
-          }
-          return res;
-        });
-      };
-
-      fetch("/api/auth/me")
-        .then((r) => {
-          if (!r.ok) { window.location.replace("/login"); return null; }
-          return r.json();
-        })
-        .then((user) => {
-          if (!user) return;
-
-          window.__SPECTERS_USER__ = user;
-
-          document.getElementById("user-display-name").textContent = user.username;
-
-          if (user.role === "admin") {
-            document.getElementById("admin-menu-item").classList.remove("hidden");
-          }
-
-        })
-        .catch(() => window.location.replace("/login"));
-
-      const wrapper = document.getElementById("user-dropdown-wrapper");
-      const btn = document.getElementById("user-menu-btn");
-      const menu = document.getElementById("user-dropdown-menu");
-
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const isOpen = wrapper.classList.toggle("open");
-        if (isOpen && menu) {
-          if (menu.parentElement !== document.body) document.body.appendChild(menu);
-          const r = btn.getBoundingClientRect();
-          menu.style.top = (r.bottom + 4) + "px";
-          menu.style.left = "auto";
-          menu.style.right = (window.innerWidth - r.right) + "px";
-          menu.style.minWidth = Math.max(r.width, 200) + "px";
-          menu.classList.add("portal-open");
-        } else if (menu) {
-          menu.classList.remove("portal-open");
-        }
-      });
-      menu.addEventListener("click", (e) => e.stopPropagation());
-      document.addEventListener("click", (e) => {
-        if (!wrapper.contains(e.target) && !menu.contains(e.target)) {
-          wrapper.classList.remove("open");
-          menu.classList.remove("portal-open");
-        }
-      });
-
-      document.getElementById("logout-item").addEventListener("click", async () => {
-        await fetch("/api/auth/logout", { method: "POST" });
-        window.location.replace("/login");
-      });
-
-      document.getElementById("change-password-item").addEventListener("click", () => {
-        wrapper.classList.remove("open");
-        document.getElementById("cp-current").value = "";
-        document.getElementById("cp-new").value = "";
-        document.getElementById("cp-confirm").value = "";
-        document.getElementById("cp-error").style.display = "none";
-        document.getElementById("change-password-modal").classList.remove("hidden");
-      });
-
-      document.getElementById("cp-save-btn").addEventListener("click", async () => {
-        const current = document.getElementById("cp-current").value;
-        const newPass = document.getElementById("cp-new").value;
-        const confirm = document.getElementById("cp-confirm").value;
-        const errEl = document.getElementById("cp-error");
-
-        errEl.style.display = "none";
-
-        if (!current || !newPass || !confirm) {
-          errEl.textContent = "All fields are required.";
-          errEl.style.display = "block";
-          return;
-        }
-        if (newPass.length < 8) {
-          errEl.textContent = "New password must be at least 8 characters.";
-          errEl.style.display = "block";
-          return;
-        }
-        if (newPass !== confirm) {
-          errEl.textContent = "New passwords do not match.";
-          errEl.style.display = "block";
-          return;
-        }
-
-        const btn = document.getElementById("cp-save-btn");
-        btn.disabled = true;
-        btn.textContent = "Updating…";
-
-        try {
-          const res = await fetch("/api/auth/me/password", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ currentPassword: current, newPassword: newPass }),
-          });
-          const data = await res.json();
-          if (res.ok) {
-            document.getElementById("change-password-modal").classList.add("hidden");
-            if (window.showNotification) {
-              window.showNotification("Password updated successfully.", "success");
+      (function () {
+        const _fetch = window.fetch;
+        window.fetch = function (...args) {
+          return _fetch.apply(this, args).then((res) => {
+            if (
+              res.status === 401 &&
+              !args[0].toString().includes("/api/auth/")
+            ) {
+              window.location.replace("/login");
             }
-          } else {
-            errEl.textContent = data.error || "Failed to update password.";
-            errEl.style.display = "block";
+            return res;
+          });
+        };
+
+        fetch("/api/auth/me")
+          .then((r) => {
+            if (!r.ok) {
+              window.location.replace("/login");
+              return null;
+            }
+            return r.json();
+          })
+          .then((user) => {
+            if (!user) return;
+
+            window.__SPECTERS_USER__ = user;
+
+            document.getElementById("user-display-name").textContent =
+              user.username;
+
+            if (user.role === "admin") {
+              document
+                .getElementById("admin-menu-item")
+                .classList.remove("hidden");
+            }
+          })
+          .catch(() => window.location.replace("/login"));
+
+        const wrapper = document.getElementById("user-dropdown-wrapper");
+        const btn = document.getElementById("user-menu-btn");
+        const menu = document.getElementById("user-dropdown-menu");
+
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isOpen = wrapper.classList.toggle("open");
+          if (isOpen && menu) {
+            if (menu.parentElement !== document.body)
+              document.body.appendChild(menu);
+            const r = btn.getBoundingClientRect();
+            menu.style.top = r.bottom + 4 + "px";
+            menu.style.left = "auto";
+            menu.style.right = window.innerWidth - r.right + "px";
+            menu.style.minWidth = Math.max(r.width, 200) + "px";
+            menu.classList.add("portal-open");
+          } else if (menu) {
+            menu.classList.remove("portal-open");
           }
-        } catch {
-          errEl.textContent = "Connection error.";
-          errEl.style.display = "block";
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "Update Password";
-        }
-      });
-    })();
+        });
+        menu.addEventListener("click", (e) => e.stopPropagation());
+        document.addEventListener("click", (e) => {
+          if (!wrapper.contains(e.target) && !menu.contains(e.target)) {
+            wrapper.classList.remove("open");
+            menu.classList.remove("portal-open");
+          }
+        });
+
+        document
+          .getElementById("logout-item")
+          .addEventListener("click", async () => {
+            await fetch("/api/auth/logout", { method: "POST" });
+            window.location.replace("/login");
+          });
+
+        document
+          .getElementById("change-password-item")
+          .addEventListener("click", () => {
+            wrapper.classList.remove("open");
+            document.getElementById("cp-current").value = "";
+            document.getElementById("cp-new").value = "";
+            document.getElementById("cp-confirm").value = "";
+            document.getElementById("cp-error").style.display = "none";
+            document
+              .getElementById("change-password-modal")
+              .classList.remove("hidden");
+          });
+
+        document
+          .getElementById("cp-save-btn")
+          .addEventListener("click", async () => {
+            const current = document.getElementById("cp-current").value;
+            const newPass = document.getElementById("cp-new").value;
+            const confirm = document.getElementById("cp-confirm").value;
+            const errEl = document.getElementById("cp-error");
+
+            errEl.style.display = "none";
+
+            if (!current || !newPass || !confirm) {
+              errEl.textContent = "All fields are required.";
+              errEl.style.display = "block";
+              return;
+            }
+            if (newPass.length < 8) {
+              errEl.textContent = "New password must be at least 8 characters.";
+              errEl.style.display = "block";
+              return;
+            }
+            if (newPass !== confirm) {
+              errEl.textContent = "New passwords do not match.";
+              errEl.style.display = "block";
+              return;
+            }
+
+            const btn = document.getElementById("cp-save-btn");
+            btn.disabled = true;
+            btn.textContent = "Updating…";
+
+            try {
+              const res = await fetch("/api/auth/me/password", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  currentPassword: current,
+                  newPassword: newPass,
+                }),
+              });
+              const data = await res.json();
+              if (res.ok) {
+                document
+                  .getElementById("change-password-modal")
+                  .classList.add("hidden");
+                if (window.showNotification) {
+                  window.showNotification(
+                    "Password updated successfully.",
+                    "success",
+                  );
+                }
+              } else {
+                errEl.textContent = data.error || "Failed to update password.";
+                errEl.style.display = "block";
+              }
+            } catch {
+              errEl.textContent = "Connection error.";
+              errEl.style.display = "block";
+            } finally {
+              btn.disabled = false;
+              btn.textContent = "Update Password";
+            }
+          });
+      })();
     </script>
     <script>
-    (function() {
-      const bar = document.getElementById("loading-bar");
-      const screen = document.getElementById("loading-screen");
-      if (!bar || !screen) return;
+      (function () {
+        const bar = document.getElementById("loading-bar");
+        const screen = document.getElementById("loading-screen");
+        if (!bar || !screen) return;
 
-      let progress = 0;
-      const resources = document.querySelectorAll('link[rel="stylesheet"], script[src]');
-      const total = resources.length + 1; // +1 for window load
-      let loaded = 0;
+        let progress = 0;
+        const resources = document.querySelectorAll(
+          'link[rel="stylesheet"], script[src]',
+        );
+        const total = resources.length + 1;
+        let loaded = 0;
 
-      function tick() {
-        loaded++;
-        progress = Math.min(95, (loaded / total) * 100);
-        bar.style.width = progress + "%";
-      }
+        function tick() {
+          loaded++;
+          progress = Math.min(95, (loaded / total) * 100);
+          bar.style.width = progress + "%";
+        }
 
-      resources.forEach((el) => {
-        if (el.complete || el.sheet) { tick(); return; }
-        el.addEventListener("load", tick);
-        el.addEventListener("error", tick);
-      });
+        resources.forEach((el) => {
+          if (el.complete || el.sheet) {
+            tick();
+            return;
+          }
+          el.addEventListener("load", tick);
+          el.addEventListener("error", tick);
+        });
 
-      function finish() {
-        bar.style.width = "100%";
-        setTimeout(() => {
-          screen.style.opacity = "0";
-          setTimeout(() => screen.remove(), 400);
-        }, 200);
-      }
+        function finish() {
+          bar.style.width = "100%";
+          setTimeout(() => {
+            screen.style.opacity = "0";
+            setTimeout(() => screen.remove(), 400);
+          }, 200);
+        }
 
-      if (document.readyState === "complete") { finish(); }
-      else { window.addEventListener("load", finish); }
-    })();
+        if (document.readyState === "complete") {
+          finish();
+        } else {
+          window.addEventListener("load", finish);
+        }
+      })();
     </script>
   </body>
 </html>

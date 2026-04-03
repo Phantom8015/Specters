@@ -47,7 +47,9 @@ function terminal(server) {
         },
       });
 
-      console.log(`Terminal process started with PID: ${connectionData.process.pid}`);
+      console.log(
+        `Terminal process started with PID: ${connectionData.process.pid}`,
+      );
       connectionData.isReady = true;
 
       connectionData.process.onData((data) => {
@@ -55,7 +57,9 @@ function terminal(server) {
       });
 
       connectionData.process.onExit(({ exitCode, signal }) => {
-        console.log(`Terminal exited with code: ${exitCode}, signal: ${signal}`);
+        console.log(
+          `Terminal exited with code: ${exitCode}, signal: ${signal}`,
+        );
         broadcast(
           connectionData,
           `\r\n\u001b[31m[Terminal exited with code ${exitCode}]\u001b[0m\r\n`,

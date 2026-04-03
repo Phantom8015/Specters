@@ -41,17 +41,50 @@ try {
 }
 
 const TEXT_EXTENSIONS = [
-  ".js", ".ts", ".jsx", ".tsx", ".py", ".java", ".c", ".cpp", ".h", ".hpp",
-  ".cs", ".php", ".rb", ".go", ".rs", ".swift", ".kt", ".scala", ".sh",
-  ".bat", ".ps1", ".sql", ".html", ".css", ".scss", ".less", ".yaml", ".yml",
-  ".toml", ".ini", ".cfg", ".conf", ".log", ".md", ".txt",
+  ".js",
+  ".ts",
+  ".jsx",
+  ".tsx",
+  ".py",
+  ".java",
+  ".c",
+  ".cpp",
+  ".h",
+  ".hpp",
+  ".cs",
+  ".php",
+  ".rb",
+  ".go",
+  ".rs",
+  ".swift",
+  ".kt",
+  ".scala",
+  ".sh",
+  ".bat",
+  ".ps1",
+  ".sql",
+  ".html",
+  ".css",
+  ".scss",
+  ".less",
+  ".yaml",
+  ".yml",
+  ".toml",
+  ".ini",
+  ".cfg",
+  ".conf",
+  ".log",
+  ".md",
+  ".txt",
 ];
 
 const isTextFile = (filePath, mimeType) => {
   const ext = path.extname(filePath).toLowerCase();
   return (
     mimeType.startsWith("text/") ||
-    ["application/json", "application/javascript", "application/xml"].includes(mimeType) ||
+    ["application/json", "application/javascript", "application/xml"].includes(
+      mimeType,
+    ) ||
     TEXT_EXTENSIONS.includes(ext)
   );
 };
@@ -82,17 +115,16 @@ const getDirSize = async (dirPath) => {
   }
 };
 
-
 app.get("/login", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "login.html"))
+  res.sendFile(path.join(__dirname, "public", "login.html")),
 );
 
 app.get("/setup", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "setup.html"))
+  res.sendFile(path.join(__dirname, "public", "setup.html")),
 );
 
 app.get("/auth.css", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "auth.css"))
+  res.sendFile(path.join(__dirname, "public", "auth.css")),
 );
 
 setupAuthRoutes(app);
@@ -100,7 +132,6 @@ setupAuthRoutes(app);
 app.use(requireAuth);
 
 app.use(express.static("public"));
-
 
 /**
  * Returns the best default browse path for the current environment.
@@ -117,7 +148,7 @@ app.get("/", async (req, res) => {
   try {
     const html = await fs.readFile(
       path.join(__dirname, "public", "index.html"),
-      "utf8"
+      "utf8",
     );
     const defaultPath = getDefaultBrowsePath();
     res.send(html.replace("%%DEFAULT_PATH%%", defaultPath));
@@ -172,11 +203,15 @@ app.get(
         return a.name.localeCompare(b.name);
       });
 
-      res.json({ currentPath: dirPath, parent: path.dirname(dirPath), files: validFiles });
+      res.json({
+        currentPath: dirPath,
+        parent: path.dirname(dirPath),
+        files: validFiles,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.post(
@@ -197,14 +232,20 @@ app.post(
 
       const targetStat = await fs.stat(targetPath);
       if (!targetStat.isDirectory()) {
-        return res.status(400).json({ error: "Target path is not a directory" });
+        return res
+          .status(400)
+          .json({ error: "Target path is not a directory" });
       }
 
       const uploadedFiles = await Promise.all(
         req.files.map(async (file) => {
           const targetFilePath = path.join(targetPath, file.originalname);
           await fs.writeFile(targetFilePath, file.buffer);
-          return { name: file.originalname, path: targetFilePath, size: file.size };
+          return {
+            name: file.originalname,
+            path: targetFilePath,
+            size: file.size,
+          };
         }),
       );
 
@@ -216,7 +257,7 @@ app.post(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.post(
@@ -232,7 +273,7 @@ app.post(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.delete(
@@ -247,7 +288,7 @@ app.delete(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.post(
@@ -263,7 +304,7 @@ app.post(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.post(
@@ -279,7 +320,7 @@ app.post(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.post(
@@ -294,7 +335,7 @@ app.post(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.get(
@@ -324,9 +365,14 @@ app.get(
       const sizeInMB = dirSize / (1024 * 1024);
 
       res.setHeader("Content-Type", "application/zip");
-      res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(fileName)}.zip"`);
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${encodeURIComponent(fileName)}.zip"`,
+      );
 
-      const archive = archiver("zip", { zlib: { level: sizeInMB > 500 ? 3 : 6 } });
+      const archive = archiver("zip", {
+        zlib: { level: sizeInMB > 500 ? 3 : 6 },
+      });
       archive.on("error", (err) => {
         if (!res.headersSent) res.status(500).json({ error: err.message });
       });
@@ -336,7 +382,7 @@ app.get(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.post(
@@ -355,7 +401,9 @@ app.post(
         res.json({ success: true, path: archivePath, size: archive.pointer() });
       });
 
-      archive.on("error", (err) => { throw err; });
+      archive.on("error", (err) => {
+        throw err;
+      });
       archive.pipe(output);
 
       for (const filePath of paths) {
@@ -371,7 +419,7 @@ app.post(
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.post(
@@ -389,8 +437,10 @@ app.post(
         zipfile.readEntry();
         zipfile.on("entry", (entry) => {
           const entryPath = path.resolve(extractPath, entry.fileName);
-          if (!entryPath.startsWith(path.resolve(extractPath) + path.sep) &&
-              entryPath !== path.resolve(extractPath)) {
+          if (
+            !entryPath.startsWith(path.resolve(extractPath) + path.sep) &&
+            entryPath !== path.resolve(extractPath)
+          ) {
             zipfile.readEntry();
             return;
           }
@@ -409,13 +459,16 @@ app.post(
         });
 
         zipfile.on("end", () => {
-          res.json({ success: true, message: "Archive extracted successfully" });
+          res.json({
+            success: true,
+            message: "Archive extracted successfully",
+          });
         });
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.get(
@@ -436,15 +489,32 @@ app.get(
       const fileName = path.basename(filePath);
 
       if (stats.size > 10 * 1024 * 1024) {
-        return res.json({ error: "File too large for preview", mimeType, size: stats.size, fileName });
+        return res.json({
+          error: "File too large for preview",
+          mimeType,
+          size: stats.size,
+          fileName,
+        });
       }
 
       if (isTextFile(filePath, mimeType)) {
         try {
           const content = await fs.readFile(filePath, "utf8");
-          res.json({ content, mimeType, type: "text", size: stats.size, fileName });
+          res.json({
+            content,
+            mimeType,
+            type: "text",
+            size: stats.size,
+            fileName,
+          });
         } catch {
-          res.json({ error: "Binary file - cannot display as text", mimeType, type: "binary", size: stats.size, fileName });
+          res.json({
+            error: "Binary file - cannot display as text",
+            mimeType,
+            type: "binary",
+            size: stats.size,
+            fileName,
+          });
         }
       } else if (isMediaFile(mimeType)) {
         res.json({
@@ -455,17 +525,32 @@ app.get(
           fileName,
         });
       } else {
-        res.json({ error: "Binary file - preview not supported", mimeType, type: "binary", size: stats.size, fileName });
+        res.json({
+          error: "Binary file - preview not supported",
+          mimeType,
+          type: "binary",
+          size: stats.size,
+          fileName,
+        });
       }
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 app.get("/api/system-stats", async (req, res) => {
   try {
-    const [cpu, mem, graphics, battery, diskLayout, networkStats, cpuTemp, time] = await Promise.all([
+    const [
+      cpu,
+      mem,
+      graphics,
+      battery,
+      diskLayout,
+      networkStats,
+      cpuTemp,
+      time,
+    ] = await Promise.all([
       si.currentLoad(),
       si.mem(),
       si.graphics(),
@@ -476,23 +561,35 @@ app.get("/api/system-stats", async (req, res) => {
       si.time(),
     ]);
 
-    const cpuLoad = Math.max(0, Math.min(100, Math.round(cpu.currentLoad || 0)));
-    const memActualUsed = mem.total - mem.free - (mem.buffers || 0) - (mem.cached || 0);
+    const cpuLoad = Math.max(
+      0,
+      Math.min(100, Math.round(cpu.currentLoad || 0)),
+    );
+    const memActualUsed =
+      mem.total - mem.free - (mem.buffers || 0) - (mem.cached || 0);
     const memPercentage = Math.round((memActualUsed / mem.total) * 100);
 
-    const primaryDisk = Array.isArray(diskLayout) && diskLayout.length > 0 ? diskLayout[0] : null;
-    const totalDisk = Array.isArray(diskLayout) ? diskLayout.reduce((a, d) => a + (d.size || 0), 0) : 0;
-    const usedDisk = Array.isArray(diskLayout) ? diskLayout.reduce((a, d) => a + (d.used || 0), 0) : 0;
+    const primaryDisk =
+      Array.isArray(diskLayout) && diskLayout.length > 0 ? diskLayout[0] : null;
+    const totalDisk = Array.isArray(diskLayout)
+      ? diskLayout.reduce((a, d) => a + (d.size || 0), 0)
+      : 0;
+    const usedDisk = Array.isArray(diskLayout)
+      ? diskLayout.reduce((a, d) => a + (d.used || 0), 0)
+      : 0;
 
     const activeNet = Array.isArray(networkStats)
-      ? networkStats.find((n) => n.operstate === "up" && n.iface !== "lo") || networkStats[0]
+      ? networkStats.find((n) => n.operstate === "up" && n.iface !== "lo") ||
+        networkStats[0]
       : null;
 
     res.json({
       cpu: {
         load: cpuLoad,
         cores: cpu.cpus?.length || os.cpus().length,
-        speed: cpu.cpus?.[0] ? Math.round((cpu.cpus[0].speed / 1000) * 1000) / 1000 : null,
+        speed: cpu.cpus?.[0]
+          ? Math.round((cpu.cpus[0].speed / 1000) * 1000) / 1000
+          : null,
         temp: cpuTemp.main || null,
       },
       memory: {
@@ -505,11 +602,20 @@ app.get("/api/system-stats", async (req, res) => {
         ? {
             name: graphics.controllers[0].model || "Unknown GPU",
             memory: graphics.controllers[0].memoryTotal
-              ? Math.round((graphics.controllers[0].memoryTotal / 1024) * 1000) / 1000
+              ? Math.round(
+                  (graphics.controllers[0].memoryTotal / 1024) * 1000,
+                ) / 1000
               : null,
-            utilization: graphics.controllers[0].utilizationGpu !== null
-              ? Math.max(0, Math.min(100, Math.round(graphics.controllers[0].utilizationGpu)))
-              : null,
+            utilization:
+              graphics.controllers[0].utilizationGpu !== null
+                ? Math.max(
+                    0,
+                    Math.min(
+                      100,
+                      Math.round(graphics.controllers[0].utilizationGpu),
+                    ),
+                  )
+                : null,
             temp: graphics.controllers[0].temperatureGpu || null,
           }
         : null,
@@ -517,7 +623,8 @@ app.get("/api/system-stats", async (req, res) => {
         ? {
             used: Math.round((usedDisk / 1024 / 1024 / 1024) * 10) / 10,
             total: Math.round((totalDisk / 1024 / 1024 / 1024) * 10) / 10,
-            percentage: totalDisk > 0 ? Math.round((usedDisk / totalDisk) * 100) : 0,
+            percentage:
+              totalDisk > 0 ? Math.round((usedDisk / totalDisk) * 100) : 0,
           }
         : null,
       network: activeNet

@@ -28,7 +28,6 @@ function getOrCreateSecret() {
 
 const SESSION_SECRET = process.env.SESSION_SECRET || getOrCreateSecret();
 
-
 function loadUsers() {
   try {
     if (!fs.existsSync(USERS_FILE)) return [];
@@ -43,7 +42,6 @@ async function saveUsers(users) {
   await fs.ensureDir(DATA_DIR);
   await fs.writeJson(USERS_FILE, users, { spaces: 2 });
 }
-
 
 const sessionMiddleware = session({
   store: new FileStore({
@@ -64,7 +62,6 @@ const sessionMiddleware = session({
   },
 });
 
-
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -73,7 +70,6 @@ const loginLimiter = rateLimit({
   message: { error: "Too many login attempts. Try again in 15 minutes." },
   keyGenerator: (req) => req.ip || req.socket.remoteAddress || "unknown",
 });
-
 
 /**
  * Returns true when the user may access the given filesystem path.
@@ -123,9 +119,10 @@ function derivePermissions(role, terminalAccess) {
 
 function hasPermission(user, perm) {
   if (user.role === "admin") return true;
-  return (user.permissions || derivePermissions(user.role, false)).includes(perm);
+  return (user.permissions || derivePermissions(user.role, false)).includes(
+    perm,
+  );
 }
-
 
 /**
  * Core auth guard.  Redirects unauthenticated browser requests to /login (or
@@ -203,7 +200,9 @@ function requirePathAccess(getPath) {
     if (!checkPathAccess(req.user, targetPath)) {
       return res
         .status(403)
-        .json({ error: "Access denied: path outside your allowed directories" });
+        .json({
+          error: "Access denied: path outside your allowed directories",
+        });
     }
     next();
   };
@@ -220,12 +219,13 @@ function requirePathsAccess(getPaths) {
     if (denied) {
       return res
         .status(403)
-        .json({ error: "Access denied: path outside your allowed directories" });
+        .json({
+          error: "Access denied: path outside your allowed directories",
+        });
     }
     next();
   };
 }
-
 
 function setupAuthRoutes(app) {
   app.post("/api/auth/setup", async (req, res) => {
@@ -369,7 +369,15 @@ function setupAuthRoutes(app) {
   });
 
   app.post("/api/auth/users", requireAuth, requireAdmin, async (req, res) => {
-    const { username, password, role, terminalAccess, pathMode, allowedPaths, deniedPaths } = req.body;
+    const {
+      username,
+      password,
+      role,
+      terminalAccess,
+      pathMode,
+      allowedPaths,
+      deniedPaths,
+    } = req.body;
 
     if (
       !username ||
@@ -377,19 +385,27 @@ function setupAuthRoutes(app) {
       username.trim().length < 2 ||
       username.trim().length > 32
     ) {
-      return res.status(400).json({ error: "Username must be 2–32 characters" });
+      return res
+        .status(400)
+        .json({ error: "Username must be 2–32 characters" });
     }
     if (!/^[a-zA-Z0-9_-]+$/.test(username.trim())) {
       return res.status(400).json({ error: "Invalid username format" });
     }
     if (!password || password.length < 8) {
-      return res.status(400).json({ error: "Password must be at least 8 characters" });
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 8 characters" });
     }
     if (!["admin", "readwrite", "readonly"].includes(role)) {
-      return res.status(400).json({ error: "Role must be admin, readwrite, or readonly" });
+      return res
+        .status(400)
+        .json({ error: "Role must be admin, readwrite, or readonly" });
     }
     const validPathModes = ["all", "allowlist", "denylist"];
-    const resolvedPathMode = validPathModes.includes(pathMode) ? pathMode : "all";
+    const resolvedPathMode = validPathModes.includes(pathMode)
+      ? pathMode
+      : "all";
 
     const users = loadUsers();
     if (users.find((u) => u.username === username.trim())) {
@@ -409,8 +425,10 @@ function setupAuthRoutes(app) {
       role,
       permissions: derivePermissions(role, !!terminalAccess),
       pathMode: role === "admin" ? "all" : resolvedPathMode,
-      allowedPaths: resolvedPathMode === "allowlist" ? cleanPaths(allowedPaths) : [],
-      deniedPaths:  resolvedPathMode === "denylist"  ? cleanPaths(deniedPaths)  : [],
+      allowedPaths:
+        resolvedPathMode === "allowlist" ? cleanPaths(allowedPaths) : [],
+      deniedPaths:
+        resolvedPathMode === "denylist" ? cleanPaths(deniedPaths) : [],
       createdAt: new Date().toISOString(),
       lastLogin: null,
     };
@@ -422,56 +440,76 @@ function setupAuthRoutes(app) {
     res.json({ success: true, user: userResponse });
   });
 
-  app.put("/api/auth/users/:id", requireAuth, requireAdmin, async (req, res) => {
-    const { role, terminalAccess, pathMode, allowedPaths, deniedPaths, password } = req.body;
-    const users = loadUsers();
-    const userIdx = users.findIndex((u) => u.id === req.params.id);
+  app.put(
+    "/api/auth/users/:id",
+    requireAuth,
+    requireAdmin,
+    async (req, res) => {
+      const {
+        role,
+        terminalAccess,
+        pathMode,
+        allowedPaths,
+        deniedPaths,
+        password,
+      } = req.body;
+      const users = loadUsers();
+      const userIdx = users.findIndex((u) => u.id === req.params.id);
 
-    if (userIdx === -1)
-      return res.status(404).json({ error: "User not found" });
+      if (userIdx === -1)
+        return res.status(404).json({ error: "User not found" });
 
-    const user = users[userIdx];
+      const user = users[userIdx];
 
-    if (role && role !== "admin" && user.role === "admin") {
-      const adminCount = users.filter((u) => u.role === "admin").length;
-      if (adminCount <= 1) {
-        return res.status(400).json({ error: "Cannot demote the last administrator" });
+      if (role && role !== "admin" && user.role === "admin") {
+        const adminCount = users.filter((u) => u.role === "admin").length;
+        if (adminCount <= 1) {
+          return res
+            .status(400)
+            .json({ error: "Cannot demote the last administrator" });
+        }
       }
-    }
 
-    if (role && ["admin", "readwrite", "readonly"].includes(role)) {
-      user.role = role;
-    }
+      if (role && ["admin", "readwrite", "readonly"].includes(role)) {
+        user.role = role;
+      }
 
-    if (role !== undefined || terminalAccess !== undefined) {
-      const effectiveTerminal =
-        terminalAccess !== undefined ? !!terminalAccess : (user.permissions || []).includes("execute");
-      user.permissions = derivePermissions(user.role, effectiveTerminal);
-    }
+      if (role !== undefined || terminalAccess !== undefined) {
+        const effectiveTerminal =
+          terminalAccess !== undefined
+            ? !!terminalAccess
+            : (user.permissions || []).includes("execute");
+        user.permissions = derivePermissions(user.role, effectiveTerminal);
+      }
 
-    const validPathModes = ["all", "allowlist", "denylist"];
-    if (pathMode && validPathModes.includes(pathMode)) {
-      const cleanPaths = (arr) =>
-        (Array.isArray(arr) ? arr : [])
-          .map((p) => (typeof p === "string" ? p.trim() : ""))
-          .filter(Boolean);
+      const validPathModes = ["all", "allowlist", "denylist"];
+      if (pathMode && validPathModes.includes(pathMode)) {
+        const cleanPaths = (arr) =>
+          (Array.isArray(arr) ? arr : [])
+            .map((p) => (typeof p === "string" ? p.trim() : ""))
+            .filter(Boolean);
 
-      user.pathMode = user.role === "admin" ? "all" : pathMode;
-      user.allowedPaths = pathMode === "allowlist" ? cleanPaths(allowedPaths) : [];
-      user.deniedPaths  = pathMode === "denylist"  ? cleanPaths(deniedPaths)  : [];
-    }
+        user.pathMode = user.role === "admin" ? "all" : pathMode;
+        user.allowedPaths =
+          pathMode === "allowlist" ? cleanPaths(allowedPaths) : [];
+        user.deniedPaths =
+          pathMode === "denylist" ? cleanPaths(deniedPaths) : [];
+      }
 
-    if (password) {
-      if (password.length < 8)
-        return res.status(400).json({ error: "Password must be at least 8 characters" });
-      user.passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    }
+      if (password) {
+        if (password.length < 8)
+          return res
+            .status(400)
+            .json({ error: "Password must be at least 8 characters" });
+        user.passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+      }
 
-    await saveUsers(users);
+      await saveUsers(users);
 
-    const { passwordHash, ...userResponse } = user;
-    res.json({ success: true, user: userResponse });
-  });
+      const { passwordHash, ...userResponse } = user;
+      res.json({ success: true, user: userResponse });
+    },
+  );
 
   app.delete(
     "/api/auth/users/:id",
@@ -502,7 +540,7 @@ function setupAuthRoutes(app) {
       users.splice(userIdx, 1);
       await saveUsers(users);
       res.json({ success: true });
-    }
+    },
   );
 }
 
